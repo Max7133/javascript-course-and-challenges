@@ -147,3 +147,69 @@ const checkBaggage = function (items) {
 checkBaggage('I have a laptop, some Food and a pocker Knife'); // You are NOT allowed on board
 checkBaggage('I have socks and a camera'); // Welcome aboard!
 checkBaggage('Got some snacks and a gun for protection'); // You are NOT allowed on board
+
+// SPLIT METHOD
+
+console.log('a+very+nice+string'.split('+')); // (4) ['a', 'very', 'nice', 'string']
+console.log('Maksim Pa'.split(' ')); // (2) ['Maksim', 'Pa']
+
+// JOIN METHOD
+const [firstName, lastName] = 'Maksim Pa'.split(' ');
+
+const newName = ['Mr.', firstName, lastName.toUpperCase()].join(' ');
+console.log(newName);
+
+// Capitalazing first letter of words
+const capitalizeName = function (name) {
+  const names = name.split(' ');
+  const namesUpper = [];
+  console.log(names);
+
+  for (const n of names) {
+    // lopping over and pushing in to a new array
+    // First way
+    // namesUpper.push(n[0].toUpperCase() + n.slice(1)); // joined it with the rest of the word starting from position 1
+    // Second way
+    namesUpper.push(n.replace(n[0], n[0].toUpperCase()));
+  }
+  console.log(namesUpper.join(' ')); // Jessica Ann Smith Davis
+};
+
+capitalizeName('jessica ann smith davis');
+capitalizeName('maksim pas');
+
+// PADDING A STRING
+// Add a number of character to the String until the String has a certain desired length
+const message = 'Go to gate 23!';
+// padStart() will add some characters to the beginning of the String
+// first argument is the Length of the String
+// second argument is the Character I want to Pad the String with
+console.log(message.padStart(25, '+')); // +++++++++++Go to gate 23!
+
+// PAD ENT (taking this result, and immediately also pad the end of the String)
+// It will add 5 '+' to the end of the String
+console.log(message.padStart(25, '+').padEnd(30, '+'));
+
+// Credit card masking example
+const maskCreditCard = function (number) {
+  // converting number to a String
+  const str = number + ''; // 'number'
+  const last = str.slice(-4); // I took the last 4
+  return last.padStart(str.length, '*'); // then I padded the rest of the string, until it matched the original length of the string (8) <- in first example
+};
+console.log(maskCreditCard(33141235)); // ****1235
+console.log(maskCreditCard(33141235135315)); // **********5315
+console.log(maskCreditCard('324234234123414123')); // **************4123
+
+// REPEAT METHOD
+
+const repeatingMessage = 'Bad weather.. All Departures Delayed... ';
+console.log(repeatingMessage.repeat(5)); // It will repeat the message 5 times
+
+// it will repeat as many times as there are planes waiting
+const planesInLine = function (n) {
+  console.log(`There are ${n} planes in line ${'✈️'.repeat(n)}`);
+};
+planesInLine(5); // There are 5 planes in line ✈️✈️✈️✈️✈️
+planesInLine(3); // There are 3 planes in line ✈️✈️✈️
+planesInLine(12); // There are 12 planes in line ✈️✈️✈️✈️✈️✈️✈️✈️✈️✈️✈️✈️
