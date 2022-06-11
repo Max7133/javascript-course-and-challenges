@@ -80,3 +80,88 @@ console.log(swiss); // {airline: 'Swiss Air Lines', iataCode: 'LX', bookings: Ar
 // A BETTER way of doing the EXACT same thing.
 // Instead of using the Apply Method, I can still use the Call Method
 book.call(swiss, ...flightData); // Is written the SAME as book.apply(swiss, flightData); So the output is the same.
+
+// B I N D  M E T H O D
+// Just like the Call Method, Bind Method also allows to manually set the THIS Keyword for ANY Function call
+// The difference is that B I N D does not immediately call the Function, instead it returns a NEW Function, where the THIS Keyword is bound.
+// So it is set to whatever Value I pass in to the Bind Method
+
+// I need to use the 'book' Function for 'eurowings' all the time.
+// book.call(eurowings, 23, 'Sarah Williams');
+// I'm using the Bind Method to create a new Function with the THIS Keyword also set to 'eurowings'
+// This will not call the 'book' Function, instead it will return a new Function, where the THIS Keyword will always be set to 'eurowings'
+const bookEW = book.bind(eurowings);
+// Creating 1 booking Function for each of the airlines
+const bookLH = book.bind(lufthansa);
+const bookLX = book.bind(swiss);
+// This Function bellow already has the THIS Keyword set in stone, so here I don't need to specify the THIS Keyword again
+bookEW(23, 'Stewen Williams'); // Stewen Williams booked a seat on Eurowings flight EW23
+
+// In the Call Method, I can pass multiple Arguments and the THIS Keyword 'eurowings'
+// In the Bind Method, I can do the same, and then all of these Arguments will also be basically set in stone, they will be defined and the Function will then always be called, with these same Arguments.
+// For Example, I could use Bind to create a Function, for one specific airline and a specific flight number
+const bookEW23 = book.bind(eurowings, 23); // comparing with book(flightNum, name), it is now as if the flightNum has been already set.
+bookEW23('Dr Dr'); // now I just used the name
+bookEW23('Some Guy');
+
+// Specifying parts of the Argument beforehand, is a common pattern called Partial Applicaton
+// Partial Applicaton means that a part of the arguments, of the original function are already applied (already set) like in bookEW23 with 23
+
+// Bind Method Example when using Objects together with EventListeners
+// With Event Listeners
+lufthansa.planes = 300;
+lufthansa.buyPlane = function () {
+  console.log(this); // <button class="buy">Buy new plane</button>
+  this.planes++; // whenever I click on the button, I want to add a new plane
+  console.log(this.planes); // NAN, Reason is that the THIS Keyword will point to the Button Element, thats why this console.log(this); // <button class="buy">Buy new plane</button>
+};
+// lufthansa.buyPlane(); Would Have Worked, because then the THIS Keyword would be this 'lufthansa', because that't the Object calling the Function
+// but in the example below it is the EventListener who is calling that Function
+
+// the 'Buy new plane' button has the class 'buy'
+// document.querySelector('.buy').addEventListener('click', lufthansa.buyPlane); // I need to manually define the THIS Keyword here, for it to work
+// FIX
+document
+  .querySelector('.buy')
+  .addEventListener('click', lufthansa.buyPlane.bind(lufthansa)); // I need to manually define the THIS Keyword here, for it to work
+
+// Example with Partial Application for the Bind Method
+// Partial Application (preseting the Parameters)
+// A Function that adds a tax to some Value
+
+const addTax = (rate, value) => value + value * rate;
+console.log(addTax(0.1, 200));
+// There is a Tax that I use all the time
+// I can now use the Bind Function on addTax Function and preset the rate always, so it will always be 23%
+// And then I only have this addVAT Function that only calculates the VAT, for any Value I pass into it.
+// First I BIND the THIS Keyword, but since I don't have it, I write 'null'
+const addVAT = addTax.bind(null, 0.23); // is the same as addVAT = value => value + value * 0.23;
+console.log(addVAT(100)); // 123
+console.log(addVAT(23)); // 28.29
+
+// Same Example with Function calling another Function (CHALLENGE)
+// This Function below only receives the 'rate' 23% same as upper const addVAT = addTax.bind(null, 0.23);
+// My Example
+// I created addTaxRate Function that returns -> return function (value) {console.log(`${value + value * rate}`)};
+// The 1st Function needs a rate, because the rate is also what I used to define in addVAT '0.23'
+// So then the resulting Function is then the one that takes the Value
+const addTaxRate = function (rate) {
+  return function (value) {
+    console.log(`${value + value * rate}`);
+  };
+};
+
+const calculateVat = addTaxRate(0.23);
+calculateVat(100); // 123
+calculateVat(23); // 28.29
+
+// Teachers Example
+const addTaxRateTeacher = function (rate) {
+  return function (value) {
+    return value + value * rate;
+  };
+};
+
+const calculateVatTeacher = addTaxRateTeacher(0.23);
+console.log(calculateVatTeacher(100)); // 123
+console.log(calculateVatTeacher(23)); // 28.29
