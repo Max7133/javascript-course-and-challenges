@@ -17,11 +17,11 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 for (const [i, movement] of movements.entries()) {
   if (movement > 0) {
     // number of the movement ${i + 1}
-    console.log(`Movement ${i + 1}: You deposited ${movement}`);
+    console.log(`Movement ${i + 1}: You deposited ${movement}`); // Movement 1: You deposited 200
   } else {
     // Math.absis so I can take the Absolute Value, so basically removing the sign.
     // with Math.abs You withdrew 400, without Math.abs You withdrew -400
-    console.log(`Movement ${i + 1}: You withdrew ${Math.abs(movement)}`);
+    console.log(`Movement ${i + 1}: You withdrew ${Math.abs(movement)}`); // Movement 3: You withdrew 400
   }
 }
 console.log('--- FOR EACH ---');
@@ -42,9 +42,9 @@ console.log('--- FOR EACH ---');
 
 movements.forEach(function (movement, index, array) {
   if (movement > 0) {
-    console.log(`Movement ${index + 1}: You deposited ${movement}`);
+    console.log(`Movement ${index + 1}: You deposited ${movement}`); // Movement 1: You deposited 200 Movement 2: You deposited 450... etc
   } else {
-    console.log(`Movement ${index + 1}: You withdrew ${Math.abs(movement)}`);
+    console.log(`Movement ${index + 1}: You withdrew ${Math.abs(movement)}`); // Movement 3: You withdrew 400 etc....
   }
 });
 
