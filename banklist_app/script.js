@@ -92,6 +92,40 @@ const displayMovements = function (movements) {
 };
 displayMovements(account1.movements); // it will display the 'movements' from the 'account1' Object
 
+// Now I want to compute 1 Username for Each of the account holders, in 'accounts' array
+// I want to compute the username with it's initials 'stw'
+// Transforming the string into the lowerCase
+// Then I want to take the First Letter of each of the words, first I need to split up the String into multiple words
+// Since Split Method turned the String into Array, I can now immediately call the Map Method here on this Resulting Array
+
+const createUsernames = function (accs) {
+  // I don't want to create a New Array, so I will use forEach Method
+  // I just want to modify the Array I get as an Input
+  accs.forEach(function (acc) {
+    // Creating a New Property 'username' on each of the account Objects
+    acc.username = acc.owner // (each of the Account Objects has the Owner Property) and I create this username from that, and create a new Property on that Account Element. That will then contain the 'username' that I created here.
+      .toLowerCase()
+      .split(' ')
+      .map(
+        name =>
+          // In each Iteration I want to Return the First Letter
+          name[0]
+      )
+      .join('');
+    // In this Function I don't Return anything, I produce a side effect here, I'm doinf something to this 'acc' Object, so there is no need to Return anything. (I'm not creating a New Value to Return)
+  });
+};
+// createUsernames('Steven Thomas Williams'); // (3) ['s', 't', 'w'] after Join stw
+createUsernames(accounts);
+console.log(accounts); // (4) [{…}, {…}, {…}, {…}]
+// 1 of 4 Example 0:
+/* interestRate: 1.2
+movements: (8) [200, 450, -400, 3000, -650, -130, 70, 1300]
+owner: "Jonas Schmedtmann"
+pin: 1111
+username: "js"
+[[Prototype]]: Object */
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
