@@ -30,3 +30,13 @@ console.log(balance);
 let balance2 = 0;
 for (const mov of movements) balance2 += mov;
 console.log(balance2);
+
+// Getting the maximum Value of the 'movements' Array using Reduce Method
+const max = movements.reduce((acc, mov) => {
+  if (acc > mov)
+    // In Reduce Method we always have to somehow Return the Accumulator
+    // In this case, I wanto to keep the accumulator, at the Value that it already is and NOT change it.
+    return acc;
+  else return mov;
+}, movements[0]); // movements[0] is the Initial Value (DON'T PUT 0 when trying to find Max or Min Value)
+console.log(max); // 3000
