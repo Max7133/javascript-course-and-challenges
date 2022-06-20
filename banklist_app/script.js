@@ -92,6 +92,15 @@ const displayMovements = function (movements) {
 };
 displayMovements(account1.movements); // it will display the 'movements' from the 'account1' Object
 
+// Calculating TOTAL Balance & displaying on the UI
+// It will receive Array of 'movements' that is going to add all Elements to 1 Value
+const calcDisplayBalance = function (movements) {
+  // Calculating balance based on 'movements' Array
+  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${balance} EUR`;
+};
+calcDisplayBalance(account1.movements);
+
 // Now I want to compute 1 Username for Each of the account holders, in 'accounts' array
 // I want to compute the username with it's initials 'stw'
 // Transforming the string into the lowerCase
