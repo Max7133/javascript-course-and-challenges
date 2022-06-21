@@ -80,7 +80,7 @@ const displayMovements = function (movements) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
     <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-    <div class="movements__value">${mov}</div>
+    <div class="movements__value">${mov} EUR</div>
   </div>`;
     // For adding 'movements' HTML on the webpage, I need to attach it into the Container ('movements' element)
     // insertAdjacentHTML excepts 2 Strings
@@ -97,9 +97,41 @@ displayMovements(account1.movements); // it will display the 'movements' from th
 const calcDisplayBalance = function (movements) {
   // Calculating balance based on 'movements' Array
   const balance = movements.reduce((acc, mov) => acc + mov, 0);
+  // Displaying it on the UI
   labelBalance.textContent = `${balance} EUR`;
 };
 calcDisplayBalance(account1.movements);
+
+const calcDisplaySummary = function (movements) {
+  // Calculating incomes, adding all positive Number together
+  const incomes = movements
+    .filter(mov => mov > 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  // Displaying it on the UI
+  labelSumIn.textContent = `${incomes} EUR`;
+
+  const out = movements
+    .filter(mov => mov < 0)
+    .reduce((acc, mov) => acc + mov, 0);
+  // Math.abs = for removing the -
+  labelSumOut.textContent = `${Math.abs(out)} EUR`;
+
+  // This bank pays out an Interest each time that there is a deposit to the bank account.
+  // And that interest is 1.2% of the deposited amount.
+  const interest = movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * 1.2) / 100)
+    // Now the bank only pays an interest if that interest is at least 1 EUR
+    // Filtering the result of calling these interests here (deposit * 1.2) / 100) for Values that are at least 1
+    .filter((int, i, arr) => {
+      console.log(arr);
+      return int >= 1;
+    })
+    .reduce((acc, int) => acc + int, 0);
+
+  labelSumInterest.textContent = `${interest} EUR`;
+};
+calcDisplaySummary(account1.movements);
 
 // Now I want to compute 1 Username for Each of the account holders, in 'accounts' array
 // I want to compute the username with it's initials 'stw'
