@@ -92,12 +92,11 @@ const displayMovements = function (movements) {
 };
 
 // Calculating TOTAL Balance & displaying on the UI
-// It will receive Array of 'movements' that is going to add all Elements to 1 Value
-const calcDisplayBalance = function (movements) {
-  // Calculating balance based on 'movements' Array
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
+const calcDisplayBalance = function (acc) {
+  // Taking the 'movements' from the Account Object
+  acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
   // Displaying it on the UI
-  labelBalance.textContent = `${balance} EUR`;
+  labelBalance.textContent = `${acc.balance} EUR`;
 };
 
 // it will receive the entire Account, then ill take the 'movemenents' and 'interest rate'  from the account
@@ -165,6 +164,16 @@ pin: 1111
 username: "js"
 [[Prototype]]: Object */
 
+const updateUI = function (acc) {
+  // Display movements
+  // Calculating and displaying the balance, movements and summary as soon as we get the Data after succesfull LOGIN
+  displayMovements(acc.movements);
+  // Display balance
+  calcDisplayBalance(acc);
+  // Display summary (withous .movements, because I need the ENTIRE ACCOUNT)
+  calcDisplaySummary(acc);
+};
+
 // EVENT HANDLERS
 // When transfering money, I need to know from which 'account' that money should go
 let currentAccount;
@@ -195,13 +204,37 @@ btnLogin.addEventListener('click', function (e) {
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur(); // removes clicked input field after
 
-    // Display movements
-    // Calculating and displaying the balance, movements and summary as soon as we get the Data after succesfull LOGIN
-    displayMovements(currentAccount.movements);
-    // Display balance
-    calcDisplayBalance(currentAccount.movements);
-    // Display summary (withous .movements, because I need the ENTIRE ACCOUNT)
-    calcDisplaySummary(currentAccount);
+    // UPDATE UI
+    updateUI(currentAccount);
+  }
+});
+
+// I need Event (e)
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault(); //preventDefault() so it will no reload after I click the button
+  const amount = Number(inputTransferAmount.value);
+  // Account where I want to transfer money
+  // I look here for the Account which has this Value (inputTransferTo.value), the username value that I input to that form, so to which I want to transfer
+  const receiverAcc = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+  // Clearing the input field from 'Transfer Money'
+  inputTransferAmount.value = inputTransferTo.value = '';
+
+  // Checking if I have enough money, if the Value is not negative
+  if (
+    amount > 0 &&
+    receiverAcc &&
+    currentAccount.balance >= amount &&
+    receiverAcc?.username !== currentAccount.username
+  ) {
+    // Doing the transfer
+    // removing 'movements' from MY Account and adding them to ANOTHER Account
+    currentAccount.movements.push(-amount);
+    receiverAcc.movements.push(amount);
+
+    // Update UI
+    updateUI(currentAccount);
   }
 });
 
