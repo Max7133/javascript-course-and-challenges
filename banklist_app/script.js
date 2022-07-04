@@ -238,6 +238,36 @@ btnTransfer.addEventListener('click', function (e) {
   }
 });
 
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  // inputCloseUsername.value needs to be the same as the username in the current account
+  if (
+    inputCloseUsername.value === currentAccount.username &&
+    Number(inputClosePin.value) === currentAccount.pin
+  ) {
+    // Calculating the Index that I want to delete
+    // Its gonna loop over the Array, and in each iteration, I get accesss to the Current Account
+    // The I want to find the one where the account has the username === currentAccount.username
+    // the findIndex Method will the return the Index of the 1st Element in the Array that matches this condition
+    const index = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+    // DELETING THE ACCOUNT (Splice Method Mutatates the underlying Array itself)
+    console.log(index);
+    accounts.splice(index, 1);
+
+    // Hiding the CONTAINER of transfers
+    containerApp.style.opacity = 0;
+
+    // Big Difference with indexOf Method is that I can only search for a Value that is in the Array.
+    // If the Array contains the 23, then it's true, if not then false
+    // .indexOf(23)
+  }
+  // Removing the input from Close account field
+  inputCloseUsername.value = inputClosePin.value = '';
+});
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -251,3 +281,7 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////   T H E   f i n d I n d e x   M E T H O D   /////////////////////////////////////////////////////////
+// findIndex Method works almost the same as the Find Method, but, findIndex Method returns the INDEX, of the found Element and not the Element itself.
+// Both the Find & findIndex Method besides the Current Element, get access to also the Current Index and the Current Entire Array
