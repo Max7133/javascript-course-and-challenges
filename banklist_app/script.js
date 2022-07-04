@@ -90,7 +90,6 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements); // it will display the 'movements' from the 'account1' Object
 
 // Calculating TOTAL Balance & displaying on the UI
 // It will receive Array of 'movements' that is going to add all Elements to 1 Value
@@ -100,17 +99,17 @@ const calcDisplayBalance = function (movements) {
   // Displaying it on the UI
   labelBalance.textContent = `${balance} EUR`;
 };
-calcDisplayBalance(account1.movements);
 
-const calcDisplaySummary = function (movements) {
+// it will receive the entire Account, then ill take the 'movemenents' and 'interest rate'  from the account
+const calcDisplaySummary = function (acc) {
   // Calculating incomes, adding all positive Number together
-  const incomes = movements
+  const incomes = acc.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
   // Displaying it on the UI
   labelSumIn.textContent = `${incomes} EUR`;
 
-  const out = movements
+  const out = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
   // Math.abs = for removing the -
@@ -118,9 +117,9 @@ const calcDisplaySummary = function (movements) {
 
   // This bank pays out an Interest each time that there is a deposit to the bank account.
   // And that interest is 1.2% of the deposited amount.
-  const interest = movements
+  const interest = acc.movements
     .filter(mov => mov > 0)
-    .map(deposit => (deposit * 1.2) / 100)
+    .map(deposit => (deposit * acc.interestRate) / 100)
     // Now the bank only pays an interest if that interest is at least 1 EUR
     // Filtering the result of calling these interests here (deposit * 1.2) / 100) for Values that are at least 1
     .filter((int, i, arr) => {
@@ -131,7 +130,6 @@ const calcDisplaySummary = function (movements) {
 
   labelSumInterest.textContent = `${interest} EUR`;
 };
-calcDisplaySummary(account1.movements);
 
 // Now I want to compute 1 Username for Each of the account holders, in 'accounts' array
 // I want to compute the username with it's initials 'stw'
@@ -166,6 +164,46 @@ owner: "Jonas Schmedtmann"
 pin: 1111
 username: "js"
 [[Prototype]]: Object */
+
+// EVENT HANDLERS
+// When transfering money, I need to know from which 'account' that money should go
+let currentAccount;
+
+// Stopping the RELOAD after I click the button with the 'Event (e)' parameter
+btnLogin.addEventListener('click', function (e) {
+  e.preventDefault(); // Prevents this form from submitting
+  console.log('LOGIN');
+
+  currentAccount = accounts.find(
+    acc => acc.username === inputLoginUsername.value
+  );
+  console.log(currentAccount); // After typing 'js'
+  // {owner: 'Jonas Schmedtmann', movements: Array(8), interestRate: 1.2, pin: 1111, username: 'js'}
+
+  // Checking if the PIN is entered correctly
+  // I'm converting it to a Number because the value is a String
+  // if (currentAccount?) I putted '?' so it would read it, if the currentAccount EXISTS
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display UI and welcome message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0] // [0] Jonas
+    }`;
+    // After succesfull login, it will set the opasity from 0 to 100, and it will show the container with transactions
+    containerApp.style.opacity = 100;
+
+    // Remove the input from login fields after ENTER
+    inputLoginUsername.value = inputLoginPin.value = '';
+    inputLoginPin.blur(); // removes clicked input field after
+
+    // Display movements
+    // Calculating and displaying the balance, movements and summary as soon as we get the Data after succesfull LOGIN
+    displayMovements(currentAccount.movements);
+    // Display balance
+    calcDisplayBalance(currentAccount.movements);
+    // Display summary (withous .movements, because I need the ENTIRE ACCOUNT)
+    calcDisplaySummary(currentAccount);
+  }
+});
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
