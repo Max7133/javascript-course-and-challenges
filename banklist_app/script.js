@@ -153,9 +153,9 @@ const createUsernames = function (accs) {
     // In this Function I don't Return anything, I produce a side effect here, I'm doinf something to this 'acc' Object, so there is no need to Return anything. (I'm not creating a New Value to Return)
   });
 };
-// createUsernames('Steven Thomas Williams'); // (3) ['s', 't', 'w'] after Join stw
+// createUsernames('Steven Thomas Williams'); // (3) ['s', 't', 'w'] after Join stw
 createUsernames(accounts);
-console.log(accounts); // (4) [{…}, {…}, {…}, {…}]
+console.log(accounts); // (4) [{…}, {…}, {…}, {…}]
 // 1 of 4 Example 0:
 /* interestRate: 1.2
 movements: (8) [200, 450, -400, 3000, -650, -130, 70, 1300]
@@ -236,6 +236,21 @@ btnTransfer.addEventListener('click', function (e) {
     // Update UI
     updateUI(currentAccount);
   }
+});
+
+// Requesting Loan (Bank Rule, it grants a loan if there at least one deposit with at least 10% of the requested loan amount.)
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+  // If at least one of the Elements in the 'movements' Array has THIS condition (is greater than 10% of the requested amount), then all of this here will be true
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    // Add movement (for 'js' User, I can request max 30000, because 3000 is the 10% of that)
+    currentAccount.movements.push(amount);
+    // Update UI
+    updateUI(currentAccount);
+  }
+  inputLoanAmount.value = '';
 });
 
 btnClose.addEventListener('click', function (e) {
