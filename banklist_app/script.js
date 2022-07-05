@@ -65,17 +65,22 @@ const inputClosePin = document.querySelector('.form__input--pin');
 // So in this case, that's the 'movements' that it should display, in the UI
 // It's a good practice to pass the Data into a Function, intead of for example, having this Function work with a Global Variable
 // That would work as well, but it is best to pass that Data DIRECTLY into the Function
-const displayMovements = function (movements) {
+// Depending on the 'sort' Parameter if it's true or false, it will sort 'movements' or not
+const displayMovements = function (movements, sort = false) {
   // Emptying the entire 'movements' Container first, and only then I will start adding New Elements
   // innerHTML is similiar to 'textContent'
   // Difference:
   // textContent returns the text itself
   // HTML returns everything, including the HTML (so all HTML tags WILL BE INCLUDED)
   containerMovements.innerHTML = '';
+  // Taking a COPY of the 'movements' Array and sort that with the Slice Method
+  // If sort is False then movs should simply become 'movements'
+  // SORTING 'movements'
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
 
   // in this Function I need the movement, and current Index (mov, i)
   // starting with the 1st 'movement' down, and then adding the new ones on top.
-  movements.forEach(function (mov, i) {
+  movs.forEach(function (mov, i) {
     // Checking if it is a deposit or withdrawal
     const type = mov > 0 ? 'deposit' : 'withdrawal';
     const html = `<div class="movements__row">
@@ -281,6 +286,16 @@ btnClose.addEventListener('click', function (e) {
   }
   // Removing the input from Close account field
   inputCloseUsername.value = inputClosePin.value = '';
+});
+
+// When sorted is false, then we want to sort it
+let sorted = false;
+// Sorting Button
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !sorted);
+  // Flipping the Variable
+  sorted = !sorted; // Each time cliked, I change it to true to false to true...
 });
 
 /////////////////////////////////////////////////
