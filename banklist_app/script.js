@@ -274,8 +274,9 @@ btnClose.addEventListener('click', function (e) {
       acc => acc.username === currentAccount.username
     );
     // DELETING THE ACCOUNT (Splice Method Mutatates the underlying Array itself)
-    console.log(index);
-    accounts.splice(index, 1);
+    // We get the Index Number of 'js' account
+    console.log(index); // 0
+    accounts.splice(index, 1); // deletes the account with Index 1
 
     // Hiding the CONTAINER of transfers
     containerApp.style.opacity = 0;
