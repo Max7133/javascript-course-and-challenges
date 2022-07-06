@@ -315,3 +315,33 @@ const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 /////////////////////////////////////////////////////////   T H E   f i n d I n d e x   M E T H O D   /////////////////////////////////////////////////////////
 // findIndex Method works almost the same as the Find Method, but, findIndex Method returns the INDEX, of the found Element and not the Element itself.
 // Both the Find & findIndex Method besides the Current Element, get access to also the Current Index and the Current Entire Array
+
+////////////////////// ARRAY.from() ////////////////////////////////////////
+// Iterables like String, Maps, Sets, can be Converted to Array, with Array.from() Method
+
+// Getting the Array 'movements' Value from the UI, and not from the Array itself, and calculating the Sum
+// When I click on balance in the UI it will get all the Values
+labelBalance.addEventListener('click', function () {
+  // We are selecting all of the Elements we have in this .movements__value Class
+  const movementsUI = Array.from(
+    document.querySelectorAll('.movements__value'),
+    // Putting the ENTRIRE CALLBACK here, as the 2nd Argument
+    el => Number(el.textContent.replace('EUR', ''))
+  );
+
+  // Getting the numbers with the Map Method, and getting rid of EUR sign
+  // Taking the Current Element 'el'
+  // If we called the Map Method directly in querySelectorAll (IT WOULD NOT WORK)
+  console.log(movementsUI); // (8) ['1300 ', '70 ', '-130 ', '-650 ', '3000 ', '-400 ', '450 ', '200 ']
+});
+
+// RECAP: We used a Array.from() to create an Array from the RESULT of the querySelectorAll()
+// Which is a NodeList, which is not really an Array, but an array like structure
+// And that Array Like structyre can easily be converted to an Array with Array.from()
+// 2nd Step, we included a Mapping Function which then transforms that initiral Array, to an Array exactly as we want it
+// Basically converting the raw Element to its TextContent and replacing the EUR sign with Nothing
+
+// ANOTHER WAY OF CONVERTING document.querySelectorAll('.movements__value')
+// We can SPREAD the result of this querySelectorAll into a New Array as well.
+const movementsUI2 = [...document.querySelectorAll('.movements__value')];
+// BUT then we would have to do the Mapping separately
