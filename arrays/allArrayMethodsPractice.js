@@ -113,7 +113,8 @@ console.log(a); // 11
 console.log(++a); // 12
 
 // 3.) EVEN MORE ADVANCED CASE OF REDUCE METHOD
-// Creating a New Object instead of just a Number or just a String
+// Creating a New Object (based on the Reduce Method) instead of just a Number or just a String
+
 // Reduce Method boils down a Array to just 1 Value, that Value might very well be an Object, or a NEW ARRAY
 // We could use Reduce Method to replace many of the other Methods that we have.
 // The GOAL is to create an Object which contains the SUM of the Deposits and of the WithDrawals
@@ -135,17 +136,58 @@ console.log(++a); // 12
 //   {
 //     cur > 0 ? (sums.deposits += cur) : (sums.withdrawals += cur);
 //   },
-// But I do have them, so that's why I need to explicitly (manyally) RETURN the ACCUMULATOR from the Function
+// But I do have them, so that's why I need to explicitly (manually) RETURN the ACCUMULATOR from the Function
 // That's how the Reduce Method works, we always have to RETURN the ACCUMULATOR from Each Iteration
-// Usually it happens here if looking the Upper Example => (cur >= 1000 ? count + 1 : count)
-const sums = accounts
+// Usually it happens implicitly here if looking the Upper Example => (cur >= 1000 ? count + 1 : count)
+// Destructuring 'sums' Object
+// const sums = accounts
+const { deposits, withdrawals } = accounts
   .flatMap(accnt => accnt.movements)
   .reduce(
     (sums, cur) => {
-      cur > 0 ? (sums.deposits += cur) : (sums.withdrawals += cur);
-      return sums;
+      // Less better way
+      /* cur > 0 ? (sums.deposits += cur) : (sums.withdrawals += cur); */
+
+      // More better way
+      // I can conditionally say, that I want to select Either Deposits or Withdrawals based on 'cur > 0' Condition
+      // Using the [] Notation instead of a . Notation
+      sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur;
+      return sums; // I always need to Return in the end the Accumulator
     },
     { deposits: 0, withdrawals: 0 }
   );
 
-console.log(sums); // {deposits: 25180, withdrawals: -7340}
+// console.log(sums); // {deposits: 25180, withdrawals: -7340}
+console.log(deposits, withdrawals); // 25180 -7340
+
+// 4.)
+// A Function that converts any String to a Title Case (all the words in a sentence are Capitalized, Except some of them.)
+// this is a nice title -> This Is a Nice Title
+const convertTitleCase = function (title) {
+  const capitalize = str => str[0].toUpperCase() + str.slice(1); // for FIXING this: and Here Is Another Title with an Example (and should NOT start lowerCase)
+
+  const exceptions = ['a', 'an', 'and', 'the', 'but', 'or', 'on', 'in', 'with']; // words that should NOT be capitalized
+  // Conversion
+  // split() so I could work indicidually on Each of the words, when that's the case I need an Array
+  // so I need to SPLIT this String into an Array, so that these words, which are separated by spaces, each of them are going to be 1 of the Elements of the Array
+  // Map Method whenever I need a NEW Array with the SAME SIZE
+  // word[0] I took the 1st Character of the String and putted toUpperCase
+  // word.slice(1) I added the REST of the String to it (taking EVERYTHING starting at position 1)
+  // for keeping the same length of Array, and using 'exceptions' for checking if the Current Word is INCLUDED in that Array
+  // includes() returns a Boolean, so I'm gonna check if the word is in the 'exceptions'
+  // if the word IS IN 'exceptions Array' then I wan't to Return that Word (without upperCase), otherwise I want to Return the Capitalized Version
+  const titleCase = title
+    .toLowerCase()
+    .split(' ')
+    .map(word =>
+      // exceptions.includes(word) ? word : word[0].toUpperCase() + word.slice(1)
+      // after creating 'capitalize' Function
+      exceptions.includes(word) ? word : capitalize(word)
+    )
+    .join(' '); // join for converting back to String
+  // return titleCase;
+  return capitalize(titleCase); // when I return the 'titleCase', I capitalize it again
+};
+console.log(convertTitleCase('this is a nice title'));
+console.log(convertTitleCase('this is a LONG title but not too long'));
+console.log(convertTitleCase('and here is another title with an EXAMPLE'));
