@@ -26,7 +26,7 @@ const account1 = {
     '2022-07-12T16:32:36.790Z',
   ],
   currency: 'EUR',
-  locale: 'pt-PT', // de-DE
+  locale: 'fi-FI', // de-DE
 };
 
 const account2 = {
@@ -81,8 +81,8 @@ const inputClosePin = document.querySelector('.form__input--pin');
 /////////////////////////////////////////////////
 // Functions
 
-// Function that receives a Date as an input, Returns formated Date
-const formatMovementDate = function (date) {
+// Function that receives a Date and Locale as an input, Returns formated Date
+const formatMovementDate = function (date, locale) {
   const calcDaysPassed = (date1, date2) =>
     // Math.abs REMOVES Negative Value
     Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24)); // converting to Days;
@@ -101,10 +101,11 @@ const formatMovementDate = function (date) {
   if (daysPassed <= 7) return `${daysPassed} days ago`; // Number of Days passed
 
   // Return the Actual Date
-  const day = `${date.getDate()}`.padStart(2, 0);
-  const month = `${date.getMonth() + 1}`.padStart(2, 0); // it's 0 based, so I add 1 here
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
+  // const day = `${date.getDate()}`.padStart(2, 0);
+  // const month = `${date.getMonth() + 1}`.padStart(2, 0); // it's 0 based, so I add 1 here
+  // const year = date.getFullYear();
+  // return `${day}/${month}/${year}`;
+  return new Intl.DateTimeFormat(locale).format(date); // the Date I receive from the input: const formatMovementDate = function (date, locale)
 };
 
 // const displayMovements = function (movements, sort = false)
@@ -121,7 +122,7 @@ const displayMovements = function (acc, sort = false) {
 
     const date = new Date(acc.movementsDates[i]);
     // will display Date in the HTML in every withdrawal, deposit ('movements' Array)
-    const displayDate = formatMovementDate(date);
+    const displayDate = formatMovementDate(date, acc.locale); // passed the 'locale' Object here, acc.locale because: const displayMovements = function (acc, sort = false)
 
     const html = `
       <div class="movements__row">
@@ -213,7 +214,7 @@ btnLogin.addEventListener('click', function (e) {
     containerApp.style.opacity = 100;
 
     // Create Current Date and Time
-    // day/month/year, XX:XX
+    /*  // day/month/year, XX:XX
     const now = new Date();
     // adding 0 before date Number with padStart Method
     // `${now.getDate()}` is now a String, .padStart(2, 0) for displaying only 2 Digits, and Padding with '0' if the day is less than 10
@@ -223,7 +224,34 @@ btnLogin.addEventListener('click', function (e) {
     const hour = `${now.getHours()}`.padStart(2, 0);
     const min = `${now.getMinutes()}`.padStart(2, 0);
     // building a String from that
-    labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`;
+    labelDate.textContent = `${day}/${month}/${year}, ${hour}:${min}`; */
+
+    // Create Current Date and Time with an API
+    // Experimenting with API
+    const now = new Date();
+    // Defining Options Object for adding Hours & Minutes
+    const options = {
+      minute: 'numeric',
+      hour: 'numeric',
+      day: 'numeric',
+      month: 'numeric', // long - July, 2-digit - 07, numeric - 7
+      year: 'numeric',
+      // weekday: 'long', // short - Tue, narrow - T
+    };
+    // Getting the 'Locale' from User's Browser
+    // const locale = navigator.language;
+    // console.log(locale);
+
+    // new Intl - Namespace for the Internationalization API
+    // .DateTimeFormat() - for Times & Dates
+    // 'en-US' - Local String (language/COUNTRY)
+    // .format(now) - Date I want to Format
+    // Adding 'options' Object as a 2nd Argument into the DateTimeFormat Function
+    // labelDate.textContent = new Intl.DateTimeFormat('en-US', options).format(now);
+    labelDate.textContent = new Intl.DateTimeFormat(
+      currentAccount.locale, // will set the 'locale' that I defined in each User
+      options
+    ).format(now);
 
     // Clear input fields
     inputLoginUsername.value = inputLoginPin.value = '';
