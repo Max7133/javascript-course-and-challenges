@@ -21,9 +21,9 @@ const account1 = {
     '2020-01-28T09:15:04.904Z',
     '2020-04-01T10:17:24.185Z',
     '2020-05-08T14:11:59.604Z',
-    '2020-05-27T17:01:17.194Z',
-    '2020-07-11T23:36:17.929Z',
-    '2020-07-12T10:51:36.790Z',
+    '2022-07-08T16:32:36.790Z',
+    '2022-07-10T16:32:36.790Z',
+    '2022-07-12T16:32:36.790Z',
   ],
   currency: 'EUR',
   locale: 'pt-PT', // de-DE
@@ -42,8 +42,8 @@ const account2 = {
     '2020-01-25T14:18:46.235Z',
     '2020-02-05T16:33:06.386Z',
     '2020-04-10T14:43:26.374Z',
-    '2020-06-25T18:49:59.371Z',
-    '2020-07-26T12:01:20.894Z',
+    '2022-07-10T16:32:36.790Z',
+    '2022-07-12T16:32:36.790Z',
   ],
   currency: 'USD',
   locale: 'en-US',
@@ -81,6 +81,32 @@ const inputClosePin = document.querySelector('.form__input--pin');
 /////////////////////////////////////////////////
 // Functions
 
+// Function that receives a Date as an input, Returns formated Date
+const formatMovementDate = function (date) {
+  const calcDaysPassed = (date1, date2) =>
+    // Math.abs REMOVES Negative Value
+    Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24)); // converting to Days;
+  // [i] - current Index in the 'movements' Array, and it's the same Index that going to point to the equivalent Date in this 'movementsDate' Array
+  // common techinique of looping over 2 Arrays at the same time
+  // new Date for nicely formatted time String, and I use this String for creating a New Date Object
+  // I need that Object so that then from there, I can call the usual Methods to get the Date, Month, Year
+  // Calculating how many Days passed since the current Date and between the Date
+  // New Date() === Current Date - Date that got just received
+  const daysPassed = calcDaysPassed(new Date(), date);
+  console.log(daysPassed);
+
+  // If I want to do something today, Return NOT the Current Date, but instead Today
+  if (daysPassed === 0) return 'Today';
+  if (daysPassed === 1) return 'Yesterday';
+  if (daysPassed <= 7) return `${daysPassed} days ago`; // Number of Days passed
+
+  // Return the Actual Date
+  const day = `${date.getDate()}`.padStart(2, 0);
+  const month = `${date.getMonth() + 1}`.padStart(2, 0); // it's 0 based, so I add 1 here
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 // const displayMovements = function (movements, sort = false)
 // Passing the Entire Account not just 'movemenets'
 const displayMovements = function (acc, sort = false) {
@@ -92,17 +118,10 @@ const displayMovements = function (acc, sort = false) {
 
   movs.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
-    // [i] - current Index in the 'movements' Array, and it's the same Index that going to point to the equivalent Date in this 'movementsDate' Array
-    // common techinique of looping over 2 Arrays at the same time
-    // new Date for nicely formatted time String, and I use this String for creating a New Date Object
-    // I need that Object so that then from there, I can call the usual Methods to get the Date, Month, Year
-    const date = new Date(acc.movementsDates[i]);
-    const day = `${date.getDate()}`.padStart(2, 0);
-    const month = `${date.getMonth() + 1}`.padStart(2, 0); // it's 0 based, so I add 1 here
-    const year = date.getFullYear();
 
+    const date = new Date(acc.movementsDates[i]);
     // will display Date in the HTML in every withdrawal, deposit ('movements' Array)
-    const displayDate = `${day}/${month}/${year}`;
+    const displayDate = formatMovementDate(date);
 
     const html = `
       <div class="movements__row">
