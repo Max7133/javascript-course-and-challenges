@@ -108,6 +108,15 @@ const formatMovementDate = function (date, locale) {
   return new Intl.DateTimeFormat(locale).format(date); // the Date I receive from the input: const formatMovementDate = function (date, locale)
 };
 
+// Formatting Currencies Function
+// Universal Function that will take any value, locale, currency
+const formatCur = function (value, locale, currency) {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: currency,
+  }).format(value);
+};
+
 // const displayMovements = function (movements, sort = false)
 // Passing the Entire Account not just 'movemenets'
 const displayMovements = function (acc, sort = false) {
@@ -124,35 +133,46 @@ const displayMovements = function (acc, sort = false) {
     // will display Date in the HTML in every withdrawal, deposit ('movements' Array)
     const displayDate = formatMovementDate(date, acc.locale); // passed the 'locale' Object here, acc.locale because: const displayMovements = function (acc, sort = false)
 
+    // Formatting with Internalization API
+    /*     // 2 Parameters: 1st acc.locale, 2nd options Object {} that I straight define there
+    // on this Formatter I call the format Method
+    const formattedMov = new Intl.NumberFormat(acc.locale, {
+      style: 'currency',
+      currency: acc.currency,
+    }).format(mov); */
+    // Formatting with Internalization API (with Universal Function)
+    // 3 Arguments: value = mov, locale = acc.locale, currency = acc.currency
+    const formattedMov = formatCur(mov, acc.locale, acc.currency);
+
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${
       i + 1
     } ${type}</div>
         <div class="movements__date">${displayDate}</div>
-        <div class="movements__value">${mov.toFixed(2)}€</div>
+        <div class="movements__value">${formattedMov}</div> 
       </div>
     `;
-
+    // toFixed(2) === Number.00, toFixed() === Number, toFixed(1) === Number.0
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
 
 const calcDisplayBalance = function (acc) {
   acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${acc.balance.toFixed(2)}€`;
+  labelBalance.textContent = formatCur(acc.balance, acc.locale, acc.currency);
 };
 
 const calcDisplaySummary = function (acc) {
   const incomes = acc.movements
     .filter(mov => mov > 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumIn.textContent = `${incomes.toFixed(2)}€`;
+  labelSumIn.textContent = formatCur(incomes, acc.locale, acc.currency);
 
   const out = acc.movements
     .filter(mov => mov < 0)
     .reduce((acc, mov) => acc + mov, 0);
-  labelSumOut.textContent = `${Math.abs(out).toFixed(2)}€`;
+  labelSumOut.textContent = formatCur(Math.abs(out), acc.locale, acc.currency);
 
   const interest = acc.movements
     .filter(mov => mov > 0)
@@ -162,7 +182,7 @@ const calcDisplaySummary = function (acc) {
       return int >= 1;
     })
     .reduce((acc, int) => acc + int, 0);
-  labelSumInterest.textContent = `${interest.toFixed(2)}€`;
+  labelSumInterest.textContent = formatCur(interest, acc.locale, acc.currency);
 };
 
 const createUsernames = function (accs) {
