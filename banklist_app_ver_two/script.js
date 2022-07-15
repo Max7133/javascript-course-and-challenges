@@ -317,14 +317,17 @@ btnLoan.addEventListener('click', function (e) {
   const amount = Math.floor(inputLoanAmount.value);
 
   if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
-    // Add movement
-    currentAccount.movements.push(amount);
+    // Setting the delay for 2.5 seconds after I submit the loan
+    setTimeout(function () {
+      // Add movement
+      currentAccount.movements.push(amount);
 
-    // Add loan Date
-    currentAccount.movementsDates.push(new Date().toISOString()); // toISOString() Very useful case is when I want to Convert a particular Date Object into a String that I can then store somewhere
+      // Add loan Date
+      currentAccount.movementsDates.push(new Date().toISOString()); // toISOString() Very useful case is when I want to Convert a particular Date Object into a String that I can then store somewhere
 
-    // Update UI
-    updateUI(currentAccount);
+      // Update UI
+      updateUI(currentAccount);
+    }, 2500); // After 2.5 seconds, the loan will transfer
   }
   inputLoanAmount.value = '';
 });
