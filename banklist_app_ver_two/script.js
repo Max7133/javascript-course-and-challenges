@@ -208,15 +208,43 @@ const updateUI = function (acc) {
   calcDisplaySummary(acc);
 };
 
+// Starts the LOGOUT TIMER FUNCTION
+const startLogOutTimer = function () {
+  // I putted 'tick' to call this Function immediately, without the 1 sec delay
+  const tick = function () {
+    // Converting to minutes and seconds
+    // Also converting to String, removing decimal parts with Math.trunc and adding extra 0 with padStart
+    const min = String(Math.trunc(time / 60)).padStart(2, 0);
+    const sec = String(time % 60).padStart(2, 0);
+    // In each call, print the remaining time to UI
+    labelTimer.textContent = `${min}:${sec}`;
+    // When 0 seconds, stop timer and log out user
+    if (time === 0) {
+      clearInterval(timer); // for stopping the Timer
+      labelWelcome.textContent = 'Log in to get started';
+      containerApp.style.opacity = 0;
+    }
+    // Decrease 1 second
+    time--;
+  };
+  // Set time to 5 minutes
+  let time = 300;
+  // Call the timer every second
+  tick();
+  const timer = setInterval(tick, 1000);
+  return timer; // clearing the timer
+};
+
 ///////////////////////////////////////
 // Event handlers
-let currentAccount;
+let currentAccount, timer; // timer needs to be a Global Variable, I need this Variable to persist between different logins.
 
 // Faked LOGGED IN
-currentAccount = account1;
-updateUI(currentAccount);
-containerApp.style.opacity = 100;
+// currentAccount = account1;
+// updateUI(currentAccount);
+// containerApp.style.opacity = 100;
 
+// Login
 btnLogin.addEventListener('click', function (e) {
   // Prevent form from submitting
   e.preventDefault();
@@ -277,6 +305,12 @@ btnLogin.addEventListener('click', function (e) {
     inputLoginUsername.value = inputLoginPin.value = '';
     inputLoginPin.blur();
 
+    // Terminating the 1st timer, if the 2nd timer is triggered, when logging in to another account
+    if (timer) clearInterval(timer);
+
+    // Logged Out In Timer
+    timer = startLogOutTimer();
+
     // Update UI
     updateUI(currentAccount);
   }
@@ -306,6 +340,10 @@ btnTransfer.addEventListener('click', function (e) {
 
     // Update UI
     updateUI(currentAccount);
+
+    // Reset the Timer (after making a transfer)
+    clearInterval(timer);
+    timer = startLogOutTimer();
   }
 });
 
@@ -327,6 +365,10 @@ btnLoan.addEventListener('click', function (e) {
 
       // Update UI
       updateUI(currentAccount);
+
+      // Reset the Timer (after making a transfer)
+      clearInterval(timer);
+      timer = startLogOutTimer();
     }, 2500); // After 2.5 seconds, the loan will transfer
   }
   inputLoanAmount.value = '';
