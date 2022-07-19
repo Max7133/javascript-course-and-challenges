@@ -7,6 +7,13 @@ const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 const btnScrollTo = document.querySelector('.btn--scroll-to'); // the Button
 // # means ID
 const section1 = document.querySelector('#section--1'); // will scroll to this section 1
+const nav = document.querySelector('.nav');
+// Selecting the Tabs
+const tabs = document.querySelectorAll('.operations__tab');
+// Selecting the Tabs Container
+const tabsContainer = document.querySelector('.operations__tab-container');
+// Selecting 3 Contant Areas
+const tabsContent = document.querySelectorAll('.operations__content');
 
 ///////////////////////////////////////
 // Modal window
@@ -114,15 +121,6 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
 /////////////////////////////////////////////////////////
 ////// Tabbed component
 
-// Selecting the Tabs
-const tabs = document.querySelectorAll('.operations__tab');
-// Selecting the Tabs Container
-const tabsContainer = document.querySelector('.operations__tab-container');
-// Selecting 3 Contant Areas
-const tabsContent = document.querySelectorAll('.operations__content');
-
-//// Adding Event Handlers to the Buttons
-
 // BAD PRACTISE WAY (What if I had 200 Tabs ? Then I would have 200 copies of THIS EXACT Callback Function here, in result will Slow Down the Web Page)
 //tabs.forEach(t => t.addEventListener('click', () => console.log('TAB')));
 
@@ -167,3 +165,45 @@ tabsContainer.addEventListener('click', function (e) {
     .querySelector(`.operations__content--${clicked.dataset.tab}`) // clicked.dataset.tab shows Number 1 or 2 or 3, depending on which button I clicked
     .classList.add('operations__content--active');
 });
+
+/////////////////////////////////////////////////////////
+////// Menu fade animation
+// 'mouseentter' Does Not Bubble
+// 'mouseover' Bubble, the opposite is 'mouseout'
+// I need the Event to Bubble so it can even reach the Navigation Element
+const handleHover = function (e) {
+  // Usually This Keyword === currentTarget, currentTarget will remain Unchanged
+  // By default, This Keyword is the Same as the currentTarget (the Element on which the Event Listener is attached to)
+  // But when we set the This Keyword MANUALLY, like I did here, it will become the Value what ever I set it to.
+  console.log(this, e.currentTarget);
+  // Matching the Element that I need, they are these  Elements with 'nav__link' Class on them
+  if (e.target.classList.contains('nav__link')) {
+    // not using closest(), becaouse there are no Child Elements, where I could accidentally Click in the Link
+    const link = e.target;
+    // selecting Sibling Elements (all other Links)
+    const siblings = link.closest('.nav').querySelectorAll('.nav__link'); // I want all the Links
+    const logo = link.closest('.nav').querySelector('img'); // this Selector is for Any Image with 'img' Tag
+    // Changing the Opacity of the Siblings of the Selected Link
+    siblings.forEach(el => {
+      // Checking if the Current Element is NOT the Link itself (because 'siblings' contains Initial Link)
+      if (el !== link) el.style.opacity = this; // = opacity // the This Keyword is now the 'opacity'
+    });
+    // Same for the Logo
+    logo.style.opacity = this; // = opacity // the This Keyword is now the 'opacity'
+  }
+};
+// nav.addEventListener('mouseover', function (e) {
+//   // JS expects here a Function, not some other Regular Value, can't write handleHover(e, 0.5) here instead of function(){}
+//   handleHover(e, 0.5); // Will work because I call the Function here Manually
+// });
+// Even BETTER way, with Bind Method
+nav.addEventListener('mouseover', handleHover.bind(0.5));
+// Bind Method creates a copy of the Function that it's called on,
+// and it will set the This Keyword in this Function Call to any Value that I pass into Bind Method
+// Passing "argument" into Handler (not really an Argument)
+nav.addEventListener('mouseout', handleHover.bind(1)); // handleHover.bind() will also be a Function
+// I used a Bind Method to pass an Argument into a Hangler Function
+// It is impossible to pass another Argument into an eventHandler Function, they can only have 1 REAL Argument
+// In this case "const handleHover = function (e) {}" they can only have 1 Real Parameter that is the EVENT
+// If I want to pass addition Values into the Handler Function, then I need to use the This Keyword, like I did here
+// And if I wanted multiple Values, then I would pass here "bind(Array, or an Object)" instead of just 1 Value
