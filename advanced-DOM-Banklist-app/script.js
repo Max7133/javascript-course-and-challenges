@@ -211,7 +211,7 @@ nav.addEventListener('mouseout', handleHover.bind(1)); // handleHover.bind() wil
 /////////////////////////////////////////////////////////
 ////// Sticky navigation
 
-const initialCoords = section1.getBoundingClientRect();
+/* const initialCoords = section1.getBoundingClientRect();
 console.log(initialCoords); // Will get the Current Top Value of Section1 (Now, I can use it for Sticky Navigation)
 
 // Scroll Event (is not efficient, and SHOULD be AVOIDED! It's BAD for Performance, it will fire up the Callback Function, each time we scroll)
@@ -221,4 +221,60 @@ window.addEventListener('scroll', function () {
   if (this.window.scrollY > initialCoords.top) nav.classList.add('sticky');
   // It will work, because at some point it will reach the position of the page, which is greater than the distance of the SECTION 1 from the top
   else nav.classList.remove('sticky');
-}); // will work each time when we scroll tha page
+}); // will work each time when we scroll tha page */
+
+/////////////////////////////////////////////////////////
+////// Intersection observer API
+
+//// Trying Out The Intersection observer API
+// Will be called each time that the Observed Element 'section1', is Intersecting with the 'root' Element at the 'threshold' that I defined.
+// When all Conditions in 'observer & obsOptions' are met, 'obsCallback' will get called, no matter if I scroll Up or Down
+// const obsCallback = function (enries, observer) {
+//   // these 'entries' are an Array of the 'threshold entries' (in THIS CASE, there is only 1 Element there)
+//   enries.forEach(entry => {
+//     console.log(entry); // IntersectionObserverEntry {....}
+//   });
+// };
+
+// const obsOptions = {
+//   root: null, // is the Element that the Target is Intersecting, after setting it to NULL, it will be able to Observe the Target Element 'section1' intersecting the Entire Viewport [rectangle thtat show the Current Portion of the Webpage]
+//   // threshold 10%
+//   /*  threshold: 0.1, // is the % of Intersection at which the Observer Callback 'obsCallback' will be called, I set it to 10%,
+//   // Example: it will be called if less or more than 10% of Target Element 'section1', are inside of the 'root'(Viewport) - is Visible */
+//   // threshold Array
+//   threshold: [0, 0.2], // 0% means that the Callback will trigger each time that the Target Element moves Completely Out of the View, and as soon as it Enters the View
+//   // (because the Callback Function will be called when the 'threshold' is passed when moving INTO the View and OUT of the View)
+// };
+// // Passing the Callback Function to it, and an Object of options
+// const observer = new IntersectionObserver(obsCallback, obsOptions);
+// observer.observe(section1); // it will Observe the Target Element 'section1'
+
+////// Using Intersection observer API on the Webpage
+// Observing the 'header' Element
+
+// Selecting Header
+const header = document.querySelector('.header');
+// Calculating the Height of the Navigation Bar DYNAMICALLY (because, it's Bad Practice to Hardcode the Value, as I did in the 'rootMargin')
+const navHeight = nav.getBoundingClientRect().height; // Will get the Nav Bar Height
+console.log(navHeight); // 90
+const stickyNav = function (entries) {
+  // no 2nd 'observer' Argument, because I don't need it here, there is only 1 'threshold' here and I don't need to Loop over the 'entries'
+  // Using Destructuring to get the 1st Element of 'entries'
+  const [entry] = entries; // gets first Element of 'entries'
+  console.log(entry);
+  // When the Header is NOT Intersecting the Viewport (root), then I add the Sticky Class
+  // isIntersecting is a Property of the 'entry', it'd either TRUE or FALSE, depending how I set the 'threshold'
+  if (!entry.isIntersecting) nav.classList.add('sticky');
+  else nav.classList.remove('sticky'); // When I scroll Up, that's where I remove this Sticky Class
+};
+// Creating Observer
+const headerObserver = new IntersectionObserver(stickyNav, {
+  root: null, // root = null, because I'm interested in ENTIRE VIEWPORT in the browser window
+  threshold: 0, // threshold = 0, because I'm interested in showing the Sticky Navigation as soon as the 'header' scrolls COMPLETELY OUT OF VIEW.
+  //rootMargin: '-90px', // rootMargin = '-90px', is a box of 90px that will be applied outside the Target Element 'header' (and 90px is the Height of the Navigation Bar)
+  rootMargin: `-${navHeight}px`, // This is the way to do it, because for Example if I have a Responsive Site
+}); // so when 0% of the Header is Visible, then I want something to happen, that is to ADD and to REMOVE the Sticky Class, this I will define in 'stickyNav' Function
+// Using headerObserver to observe the Header
+headerObserver.observe(header);
+
+// The Distance between the Start Section 1 and the Viewport is just the same as the Navigation Bar Height (this way the Navigation doesn't overlap the Section in the beginning)
