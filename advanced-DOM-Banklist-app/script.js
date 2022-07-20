@@ -207,3 +207,18 @@ nav.addEventListener('mouseout', handleHover.bind(1)); // handleHover.bind() wil
 // In this case "const handleHover = function (e) {}" they can only have 1 Real Parameter that is the EVENT
 // If I want to pass addition Values into the Handler Function, then I need to use the This Keyword, like I did here
 // And if I wanted multiple Values, then I would pass here "bind(Array, or an Object)" instead of just 1 Value
+
+/////////////////////////////////////////////////////////
+////// Sticky navigation
+
+const initialCoords = section1.getBoundingClientRect();
+console.log(initialCoords); // Will get the Current Top Value of Section1 (Now, I can use it for Sticky Navigation)
+
+// Scroll Event (is not efficient, and SHOULD be AVOIDED! It's BAD for Performance, it will fire up the Callback Function, each time we scroll)
+window.addEventListener('scroll', function () {
+  console.log(window.scrollY); // gets scroll position (from the point of the View Port to the very Top of the Page, that's why we get 0 at Start)
+  // Using the TOP Value to add the Sticky Class for Navigation
+  if (this.window.scrollY > initialCoords.top) nav.classList.add('sticky');
+  // It will work, because at some point it will reach the position of the page, which is greater than the distance of the SECTION 1 from the top
+  else nav.classList.remove('sticky');
+}); // will work each time when we scroll tha page
