@@ -276,5 +276,38 @@ const headerObserver = new IntersectionObserver(stickyNav, {
 }); // so when 0% of the Header is Visible, then I want something to happen, that is to ADD and to REMOVE the Sticky Class, this I will define in 'stickyNav' Function
 // Using headerObserver to observe the Header
 headerObserver.observe(header);
-
 // The Distance between the Start Section 1 and the Viewport is just the same as the Navigation Bar Height (this way the Navigation doesn't overlap the Section in the beginning)
+
+/////////////////////////////////////////////////////////
+////// Reveal Sections with Intersection observer API
+
+// Selecting all Sections
+const allSections = document.querySelectorAll('.section');
+
+// Reveal Sections (can put in Any Name in the Arguments)
+const revealSection = function (entries, observer) {
+  // I need 'observer' Argument this time, because I will need to unobserve later
+  const [entryTwo] = entries; // IntersectionObserverEntry {time: 175881.20000004768, rootBounds: DOMRectReadOnly, boundingClientRect: DOMRectReadOnly, intersectionRect: DOMRectReadOnly, isIntersecting: true, …}
+  console.log(entryTwo); // I will find target:, inside it there is className: "section section--hidden", I will use it to make the Section VISIBLE
+
+  // (This is a Fix, so the Section 1 won't shop up, right away)
+  // If it isIntersecting then the Function will NOT return, and the rest of the Code, Will be Executed
+  if (!entryTwo.isIntersecting) return; // Triggering .remove here, when the Section (target) is NOT intersecting, then Return right away
+
+  // Using the 'target' I will know, which is the Section that actually intersected the Viewport
+  entryTwo.target.classList.remove('section--hidden');
+  observer.unobserve(entryTwo.target); // for stopping the Events of being added, because while I scroll, the 'observer' keeps Observing the Sections (they are no longer necessary)
+};
+
+// I want to Observe all 4 Sections
+const sectionObserver = new IntersectionObserver(revealSection, {
+  root: null,
+  threshold: 0.15, // So it will show the Section a bit later after I scroll down (Section will be revealed when it's 15% visible)
+});
+// Looping over this Node List (allSections)
+// we use forEach() when does not involve creating a New Array
+// Callback Function parameter (section)
+allSections.forEach(function (section) {
+  sectionObserver.observe(section);
+  section.classList.add('section--hidden'); // will Hide all 'sections'
+});
