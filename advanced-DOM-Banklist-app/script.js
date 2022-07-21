@@ -311,3 +311,43 @@ allSections.forEach(function (section) {
   sectionObserver.observe(section);
   section.classList.add('section--hidden'); // will Hide all 'sections'
 });
+
+/////////////////////////////////////////////////////////
+////// Lazy Loading Images (Blurred Effect) with Intersection observer API
+
+// Selecting 3 Images (the ones that have data-src="img/digital.jpg" Attribute)
+const imgTargets = document.querySelectorAll('img[data-src]');
+//console.log(imgTargets); // NodeList(3) [img.features__img.lazy-img, img.features__img.lazy-img, img.features__img.lazy-img]
+
+// Callback Function where the logic is
+const loadImg = function (entries, observer) {
+  const [entryThree] = entries;
+  console.log(entryThree);
+
+  if (!entryThree.isIntersecting) return;
+
+  // Otherwise:
+  // Replacing src Attribute with data-src (as it reaches the 'img' it will replace the placeholder Image)
+  // That's the Element that's currently being Intersected
+  // .dataset, is where the Special Data Properties are stored
+  entryThree.target.src = entryThree.target.dataset.src; // entryThree.target.dataset.src where HD Image is
+  // Replacing the 'src' Attribute is happening Behind The Scenes,
+  // JS finds the New Image that it should load and display here and once it's finished loading that Image, it will EMIT the Load Event
+  // Load Event is just like any other Event and we can just listen for it, and do something
+
+  // Listening for the Load Event
+  entryThree.target.addEventListener('load', function () {
+    entryThree.target.classList.remove('lazy-img'); // Removing the Blurred Filter Class
+  });
+
+  observer.unobserve(entryThree.target);
+};
+
+const imgObserver = new IntersectionObserver(loadImg, {
+  root: null,
+  threshold: 0,
+  rootMargin: '200px', // The Website should start loading these 3 Images, 200px before those 3 Images are loaded
+  //(with this, there won't be any delay when we browse the page)
+});
+// Looping over the Targets
+imgTargets.forEach(img => imgObserver.observe(img));
