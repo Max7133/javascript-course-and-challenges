@@ -355,66 +355,123 @@ imgTargets.forEach(img => imgObserver.observe(img));
 /////////////////////////////////////////////////////////
 ////// Slider
 
-// The 3 Slides are on Top of each other
-// 1st thing: Establishing this Initial condition where they are all side by side.
-// for that I'm setting Transform Properties to % (automatically)
+const slider = function () {
+  // The 3 Slides are on Top of each other
+  // 1st thing: Establishing this Initial condition where they are all side by side.
+  // for that I'm setting Transform Properties to % (automatically)
 
-// Selecting Slider
-const slides = document.querySelectorAll('.slide');
-// Slider Buttons
-const btnLeft = document.querySelector('.slider__btn--left');
-const btnRight = document.querySelector('.slider__btn--right');
+  // Selecting Slider
+  const slides = document.querySelectorAll('.slide');
+  // Slider Buttons
+  const btnLeft = document.querySelector('.slider__btn--left');
+  const btnRight = document.querySelector('.slider__btn--right');
+  // Dot Container
+  const dotContainer = document.querySelector('.dots');
 
-// Current Visible Slide
-let curSlide = 0;
-// Max Slide where Slider can go
-const maxSlide = slides.length; // The Length of Node List
+  // Current Visible Slide
+  let curSlide = 0;
+  // Max Slide where Slider can go
+  const maxSlide = slides.length; // The Length of Node List
 
-// Scalling down Slider (TEMPORALY)
-// const slider = document.querySelector('.slider');
-// slider.style.transform = 'scale(0.4) translateX(-800px)';
-// slider.style.overflow = 'visible'; // so I will see other slides, when sliding images
+  // Scalling down Slider (TEMPORALY)
+  // const slider = document.querySelector('.slider');
+  // slider.style.transform = 'scale(0.4) translateX(-800px)';
+  // slider.style.overflow = 'visible'; // so I will see other slides, when sliding images
 
-// Putting all the Slides, Side by Side
-// Looping through the Slides
-// slides.forEach(
-//   (sld, i) => (sld.style.transform = `translateX(${100 * i}%)`) // Setting the style on each of the Slides, in translateX() where I specify the Value
-// ); // 1st slide 0%, 2nd slide 100%, 3rd slide 200%, 4th slide 300%, that's because `translateX()` will MOVE THEM to position 100%. (the Width of each IMG is 100%)
-
-// Function where I pass the Number of the Slide, where I want to go to
-const goToSlide = function (slide) {
-  slides.forEach(
-    (sld, i) => (sld.style.transform = `translateX(${100 * (i - slide)}%)`) // Setting the style on each of the Slides, in translateX() where I specify the Value
-  ); // Ex: Cur Sld = 1, 1st Slide = -100%, 2nd Slide = 0, 3rd Slide = 100, 4th Slide = 200, 1nd Iteration (0 - 1) * 100 = -100%, 2nd Iteration (1 - 1) * 100 = 0%, 3rd Iteration (2 - 1) * 100 = -100% (Active Slide Need to be 0%)
-}; /////////////////////////////////////////////////////////////////////////////////////////////// curInd = 0 s 1, //////////////////// curInd = 1 s 1 ////////////////// curInd = 2 s 1
-goToSlide(0); // When the Webpage loads, it will Automatically go to Slide 0
-
-// Next Slide
-const nextSlide = function () {
-  if (curSlide === maxSlide - 1) {
-    // -1 because 'length' is 0 based
-    curSlide = 0; // after reaches end, will return to 1st Slider
-  } else {
-    curSlide++; // adds the Slider
-  }
-
+  // Putting all the Slides, Side by Side
+  // Looping through the Slides
   // slides.forEach(
-  //   (sld, i) => (sld.style.transform = `translateX(${100 * (i - curSlide)}%)`) // Setting the style on each of the Slides, in translateX() where I specify the Value
-  //
-  goToSlide(curSlide);
-};
+  //   (sld, i) => (sld.style.transform = `translateX(${100 * i}%)`) // Setting the style on each of the Slides, in translateX() where I specify the Value
+  // ); // 1st slide 0%, 2nd slide 100%, 3rd slide 200%, 4th slide 300%, that's because `translateX()` will MOVE THEM to position 100%. (the Width of each IMG is 100%)
 
-// Previous Slide
-const previousSlide = function () {
-  // if 'curSlide' is 0, then the 'curSlide' needs to be = to 'nextSlide'
-  if (curSlide === 0) {
-    curSlide = maxSlide - 1; // 'maxSlide' is not 0 based, that's why -1
-  } else {
-    curSlide--; // The Cur Slide will be decreased
-  }
-  // Here I reuse the SAME Function I wrote before, and also with the 'curSlide'
-  goToSlide(curSlide); // Functionality of moving the Slide is the SAME, all this will do is to Update the 'transform' Property in the goToSlide Function
-};
+  // Dot Container Function
+  // Creating 1 Element for Each of the Slides, while looping over the them
+  const createDots = function () {
+    slides.forEach(function (_, i) {
+      // Don't need the 'slide' Argument
+      // Creating an HTML Element
+      dotContainer.insertAdjacentHTML(
+        'beforeend',
+        `<button class="dots__dot" data-slide="${i}"></button>` // the First button will get Index 0, then 2,3,4, so that in the Next Step I can read this Value for here, and move exactly to that Slide, once one of the Dots is Clicked.
+      ); // 'beforeend' - adding it as the Last Child always
+    });
+  };
 
-btnRight.addEventListener('click', nextSlide);
-btnLeft.addEventListener('click', previousSlide);
+  // Current Selected Slide on the Dot Container Function
+  // (slide) Arg, passing in the Current Slide
+  const activateDot = function (slidxe) {
+    // Selecting ALL of the Dots, each time I want to activate one,
+    document
+      .querySelectorAll('.dots__dot')
+      .forEach(dot => dot.classList.remove('dots__dot--active')); // then I will Remove that Active Class,
+    // then add it only on the one that I'm intrested in.
+    document
+      .querySelector(`.dots__dot[data-slide="${slidxe}"]`) // selecting based on the 'data-slide' Attribute (should have exactly the Value of ${slide})
+      .classList.add('dots__dot--active'); // the Selected Dot I can add to the classList or the Active Class.
+  };
+
+  // Function where I pass the Number of the Slide, where I want to go to
+  const goToSlide = function (slide) {
+    slides.forEach(
+      (sld, i) => (sld.style.transform = `translateX(${100 * (i - slide)}%)`) // Setting the style on each of the Slides, in translateX() where I specify the Value
+    ); // Ex: Cur Sld = 1, 1st Slide = -100%, 2nd Slide = 0, 3rd Slide = 100, 4th Slide = 200, 1nd Iteration (0 - 1) * 100 = -100%, 2nd Iteration (1 - 1) * 100 = 0%, 3rd Iteration (2 - 1) * 100 = -100% (Active Slide Need to be 0%)
+  }; /////////////////////////////////////////////////////////////////////////////////////////////// curInd = 0 s 1, //////////////////// curInd = 1 s 1 ////////////////// curInd = 2 s 1
+
+  // Next Slide
+  const nextSlide = function () {
+    if (curSlide === maxSlide - 1) {
+      // -1 because 'length' is 0 based
+      curSlide = 0; // after reaches end, will return to 1st Slider
+    } else {
+      curSlide++; // adds the Slider
+    }
+
+    // slides.forEach(
+    //   (sld, i) => (sld.style.transform = `translateX(${100 * (i - curSlide)}%)`) // Setting the style on each of the Slides, in translateX() where I specify the Value
+    //
+    goToSlide(curSlide);
+    activateDot(curSlide);
+  };
+
+  // Previous Slide
+  const previousSlide = function () {
+    // if 'curSlide' is 0, then the 'curSlide' needs to be = to 'nextSlide'
+    if (curSlide === 0) {
+      curSlide = maxSlide - 1; // 'maxSlide' is not 0 based, that's why -1
+    } else {
+      curSlide--; // The Cur Slide will be decreased
+    }
+    // Here I reuse the SAME Function I wrote before, and also with the 'curSlide'
+    goToSlide(curSlide); // Functionality of moving the Slide is the SAME, all this will do is to Update the 'transform' Property in the goToSlide Function
+    activateDot(curSlide);
+  };
+
+  const init = function () {
+    goToSlide(0); // When the Webpage loads, it will Automatically go to Slide 0
+    createDots(); // should be BEFORE I activate the Dots
+    activateDot(0); // when Reloading the Page, the Dot should be at Slide 0
+  };
+  init();
+
+  //// Event Handlers
+  btnRight.addEventListener('click', nextSlide);
+  btnLeft.addEventListener('click', previousSlide);
+
+  // Attaching Event Handler to the Keyboard Event
+  document.addEventListener('keydown', function (e) {
+    console.log(e); // IF HIT RIGHT, KeyboardEvent {isTrusted: true, key: 'ArrowRight', code: 'ArrowRight', location: 0, ctrlKey: false, …}
+    if (e.key === 'ArrowLeft') previousSlide();
+    else nextSlide();
+  });
+
+  dotContainer.addEventListener('click', function (e) {
+    if (e.target.classList.contains('dots__dot')) {
+      //const slide = e.target.dataset.slide; // using Destructuring because this Value 'slide' at the beginning is exactly the same as 'slide' at the end
+      const { slide } = e.target.dataset; // reading through an Object
+      // Now I want to go to the Slide, that I just selected
+      goToSlide(slide); // the Slide Number from the 'e.target.dataset'
+      activateDot(slide);
+    }
+  });
+};
+slider();
