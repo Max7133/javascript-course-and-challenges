@@ -339,7 +339,6 @@ const loadImg = function (entries, observer) {
   entryThree.target.addEventListener('load', function () {
     entryThree.target.classList.remove('lazy-img'); // Removing the Blurred Filter Class
   });
-
   observer.unobserve(entryThree.target);
 };
 
