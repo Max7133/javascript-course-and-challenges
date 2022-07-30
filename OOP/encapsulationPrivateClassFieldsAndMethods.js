@@ -1,6 +1,7 @@
 'use strict';
 
 /////////////////////////////////////////////////   E N C A P S U L A T I O N :   P R I V A T E   C L A S S   F I E L D S   A N D   M E T H O D S   /////////////////////////////////////////////////
+
 //// PRIVATE CLASS FIELDS AND METHODS are actually part of a Bigger proposal for Imporving and Changing JavaScript Classes which is simply called Class fields.
 //// Class Fields proposal is currently at Stage 3, so right now it's actually NOT YET PART OF the JavaScript language.
 //// However, being at Stage 3 means that it's very likely that at some point, it will move forward to Stage 4, and then it will actually become a part of the JavaScript language.
@@ -58,19 +59,22 @@ class Account {
 
   deposit(val) {
     this.#movements.push(val);
-  }
+    return this; // Because This is the Current Object (WILL MAKE THE METHOD CHAINABLE)
+  } // This Method Sets the 'movements'
 
   withdraw(val) {
     this.deposit(-val);
-  }
+    return this;
+  } // This Method Also Sets the 'movements'
 
   requestLoan(val) {
     //if (this.#approveLoan(val)) {
     if (this._approveLoan(val)) {
       this.deposit(val);
       console.log(`Loan approved`);
+      return this;
     }
-  }
+  } // This Method Changes the 'movements' Array, so all these 3 Methods, basically Set some Property, and so these are then very useful to make CHAINABLE.
 
   // STATIC METHOD (Usually we use this for HELPER FUNCTIONS)
   // Because these Static Methods WILL NOT BE AVAILABLE on all the Instances, but ONLY on the Class Itself.
@@ -101,3 +105,27 @@ console.log(acc1);
 
 // The Static Method only works like this
 Account.helper(); // Helper
+
+/////////////////////////////////////////////////   C H A I N I N G   M E T H O D S   /////////////////////////////////////////////////
+
+//// As how we CHAINED Array Methods one after another with filter(), map() and reduce()
+//// by chaining these Methods, we could first Filter an Array, then Map the result, and finally Reduxe the results of the Map, all in One Line of Code.
+//// And we can actually Implement the Same Ability of Chaining Methods in the Methods of our Class.
+//// ALL WHAT I NEED TO DO, IS TO RETURN THE OBJECT ITSELF AT THE END OF A METHOD THAT I WANT TO BE CHAINABLE!!!
+
+//// Chaining
+// acc1 and then deposit 300, and the right afterwards, I wanted to deposit again on the same acc1, and then Immediately after that, withdraw 35, then requestLoan in the middle of this, and then withdraw some more
+//acc1.deposit(300).deposit(500).withdraw(35).requestLoan(25000).withdraw(4000); // Uncaught TypeError: Cannot read properties of undefined (reading 'deposit')
+// Right now, this is NOT gonna work, the problem here is that acc1.deposit(300) Will Work, but this will then Return NOTHING
+// because the Deposit Method does Return Undefined, because I'm NOT Returning Anything EXPLICITLY in the deposit(val){ this.#movements.push(val); } so then UNDEFINED gets Returned.
+// so then HERE on .deposit(500) we are trying to CALL the Deposit Method on UNDEFINED (THAT'S WHY I GET THE ERROR)
+
+// What I need to do is to CALL the Deposit ON AN ACCOUNT.
+// what I want is for the Result of 'acc1.deposit(300)' to be Again the Account
+// for that I just need to add: return this; (in the deposit() Method) // Because This is the Current Object
+// and then I do the SAME ON ALL METHODS
+// return this; // Because This is the Current Object (WILL MAKE THE METHOD CHAINABLE) and this makes most sence, in Methods that actually SET some Property.
+// all the 3 Methods actually Do That. withdraw(), deposit(), requestLoan()
+acc1.deposit(300).deposit(500).withdraw(35).requestLoan(25000).withdraw(4000);
+console.log(acc1.getMovements()); // (8) [20, -5, 1000, 300, 500, -35, 25000, -4000]
+// Everything now worked, all the Deposits and Withdrawals that I just did, are now in the 'movements' Array.
