@@ -28,6 +28,26 @@ if (navigator.geolocation)
       //console.log(latitude, longitude); // 60.2217741 24.8258254 (with these Coordinates, I want to Load the Map and then Center that Map on this Position.)
       // creating a Link in Google Maps
       console.log(`https://www.google.com/maps/@${latitude},${longitude}`);
+
+      const coords = [latitude, longitude];
+      console.log(coords);
+
+      //// Dislplaying a Map using Leaflet Library
+
+      // Whatever String I pass in L.map(), must be the ID Name of an Element in our HTML, and it is in that Element where the Map will be displayed.
+      // the 'L' is the Main Function that Leaflet gives us as an Entry Point. (Leaflet basically gives us this 'L' Namespace, and that 'L' has couple of Methods that I can use.)
+      // the 'L' Variable is the Global Variable that we can access from All the Other Scripts (it's now available in the 'script' and the Browser Console if i type there 'L')
+      const map = L.map('map').setView(coords, 13); // 13 zoom level
+
+      L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      L.marker(coords)
+        .addTo(map)
+        .bindPopup('A pretty CSS3 popup.<br> Easily customizable.')
+        .openPopup();
     },
     function () {
       alert('Could not get your position');
