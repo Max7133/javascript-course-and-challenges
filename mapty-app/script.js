@@ -11,8 +11,66 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+class Workout {
+  // Creating date = and id = like this, is something New in JavaScript that has not been implemented to the language yet
+  // Date where the Object is created (the date in which the Workout happened)
+  date = new Date();
+  // ID (Unique Identifier)
+  // Creating ID using Date.now that shows the Current Time Stamp of right now, then convert that to a String and then take the last 10 Numbers.
+  id = (Date.now() + '').slice(-10);
+  // Will take in the Data that is common to both 'workouts'
+  constructor(coords, distance, duration) {
+    // this.date = ...
+    // this.id = ...
+    this.coords = coords; // [lat, lng]
+    this.distance = distance; // in km
+    this.duration = duration; // in min
+  }
+}
+
+// I won't directly create a 'workout'
+// Instead I will always either create a Running or a Cycling Object (Child Classes)
+class Running extends Workout {
+  // will take same Data as Parent Class 'Workout' + additional Properties on a Running Object
+  constructor(coords, distance, duration, cadence) {
+    // calling the Super Class with Arguments that are also in the Parent Class, and this will initialize the THIS Keyword
+    super(coords, distance, duration);
+    this.cadence = cadence;
+    // it's fine to Call Any Code in a Constructor (did the same in the App Class for Other Methods)
+    this.calcPace();
+  }
+  // Method for Calculating the Phase is defined in Minutes per Kilometer
+  calcPace() {
+    // adding New 'pace' Property = minutes / kilometers (the Distance)
+    this.pace = this.duration / this.distance;
+    return this.pace; // returning this Data, in case someplace in the Code ill need it
+  }
+}
+
+class Cycling extends Workout {
+  constructor(coords, distance, duration, elevationGain) {
+    // calling the Super Class with Arguments that are also in the Parent Class, and this will initialize the THIS Keyword
+    super(coords, distance, duration);
+    this.elevationGain = elevationGain;
+    this.calcSpeed();
+  }
+  // Method for Calculating the Speed is measured in Kilometers per Hour (opposite of the 'pace')
+  calcSpeed() {
+    this.speed = this.distance / (this.duration / 60); // duration is in Hours that's why I divide it by 60
+    return this.speed;
+  }
+}
 //let map, mapEvent; // Global Variable, so I can access it in the Marker Creation
 
+// FOR TESTING the Running & Cycling Class
+// Passing in Array of Coordinates Latitude 39, Longitude -12, Distance 5.2 km, Minutes 24, Steps per Minute 178
+// const run1 = new Running([39, -12], 5.2, 24, 178);
+// Passing in Array of Coordinates Latitude 39, Longitude -12, Distance 27 km, Minutes 95, Elevation Gain 523 Meters
+// const cycling1 = new Cycling([39, -12], 27, 95, 523);
+// console.log(run1, cycling1);
+
+///////////////////////////////////////////////
+//// APPLICATION ARCHITECTURE
 class App {
   // I'm gonna Define the 'map' & 'mapEvent' as Properties of the Object, using Private Classes
   #map; // both of them will now become Private Instance Properties
