@@ -3,14 +3,6 @@
 // prettier-ignore
 const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-const form = document.querySelector('.form');
-const containerWorkouts = document.querySelector('.workouts');
-const inputType = document.querySelector('.form__input--type');
-const inputDistance = document.querySelector('.form__input--distance');
-const inputDuration = document.querySelector('.form__input--duration');
-const inputCadence = document.querySelector('.form__input--cadence');
-const inputElevation = document.querySelector('.form__input--elevation');
-
 class Workout {
   // Creating date = and id = like this, is something New in JavaScript that has not been implemented to the language yet
   // Date where the Object is created (the date in which the Workout happened)
@@ -31,6 +23,7 @@ class Workout {
 // I won't directly create a 'workout'
 // Instead I will always either create a Running or a Cycling Object (Child Classes)
 class Running extends Workout {
+  type = 'running'; // This Property that's gonna be available on all the Instances
   // will take same Data as Parent Class 'Workout' + additional Properties on a Running Object
   constructor(coords, distance, duration, cadence) {
     // calling the Super Class with Arguments that are also in the Parent Class, and this will initialize the THIS Keyword
@@ -48,10 +41,13 @@ class Running extends Workout {
 }
 
 class Cycling extends Workout {
+  type = 'cycling'; // This Property that's gonna be available on all the Instances
+
   constructor(coords, distance, duration, elevationGain) {
     // calling the Super Class with Arguments that are also in the Parent Class, and this will initialize the THIS Keyword
     super(coords, distance, duration);
     this.elevationGain = elevationGain;
+    //this.type = 'cycling'; // same thing upper
     this.calcSpeed();
   }
   // Method for Calculating the Speed is measured in Kilometers per Hour (opposite of the 'pace')
@@ -71,10 +67,19 @@ class Cycling extends Workout {
 
 ///////////////////////////////////////////////
 //// APPLICATION ARCHITECTURE
+const form = document.querySelector('.form');
+const containerWorkouts = document.querySelector('.workouts');
+const inputType = document.querySelector('.form__input--type');
+const inputDistance = document.querySelector('.form__input--distance');
+const inputDuration = document.querySelector('.form__input--duration');
+const inputCadence = document.querySelector('.form__input--cadence');
+const inputElevation = document.querySelector('.form__input--elevation');
+
 class App {
   // I'm gonna Define the 'map' & 'mapEvent' as Properties of the Object, using Private Classes
   #map; // both of them will now become Private Instance Properties
   #mapEvent; // Properties that are gonna be present on All the Instances created through this Class
+  #workouts = [];
 
   // this 'constructor' Method is called Immediately when a New Object is created from this Class
   // and that Object that is created 'const app = new App()' is created right in the beginning when the Page Loads,
@@ -170,23 +175,78 @@ class App {
 
   // Submitting the 'form' for the newWorkout will create a new newWorkout
   _newWorkout(e) {
+    // Helper Function that takes in an Arbitrary Number of Inputs
+    // it will Loop over the Array, and in each of them it will check whether the Number isFinite or Not
+    // and then in the end, the every() Method will only Return True if this value was true (Number.isFinite(inp) for ALL Elements in the Array)
+    const validInputs = (...inputs) =>
+      inputs.every(inp => Number.isFinite(inp));
+    const allPositive = (...inputs) => inputs.every(inp => inp > 0);
     e.preventDefault(); // after 'enter' the Page won't reload!
+
+    // Get data from form
+
+    const type = inputType.value;
+    const distance = +inputDistance.value; // this always come as String, so I convert it to a Number with '+'
+    const duration = +inputDuration.value;
+    // Taking the Latitude & Longitude from this 'map' Object
+    const { lat, lng } = this.#mapEvent.latlng;
+    let workout;
+
+    // If workout running, create running object
+
+    if (type === 'running') {
+      const cadence = +inputCadence.value;
+      // Check if data is valid (each of them should be a Number)
+      // If the distance or duration or cadence is Not a Number for that isFinite(), then return immediately
+      if (
+        // !Number.isFinite(distance) ||
+        // !Number.isFinite(duration) ||
+        // !Number.isFinite(cadence)
+        !validInputs(distance, duration, cadence) ||
+        !allPositive(distance, duration, cadence) // if all of the Inputs are Not Valid, OR if there is Any Number that is Not Positive
+      )
+        return alert('Inputs have to be positive numbers!');
+
+      workout = new Running([lat, lng], distance, duration, cadence);
+    }
+
+    // If workout cycling, create cycling object
+
+    if (type === 'cycling') {
+      const elevation = +inputElevation.value;
+
+      if (
+        !validInputs(distance, duration, elevation) || // if all of the Inputs are Not Valid, OR if there is Any Number that is Not Positive
+        !allPositive(distance, duration) // no 'cadence' because the Elevation might be Negative
+      )
+        return alert('Inputs have to be positive numbers!');
+
+      workout = new Cycling([lat, lng], distance, duration, elevation);
+    }
+
+    // Add new object to workout array
+    this.#workouts.push(workout);
+    console.log(workout);
+
+    // Render workout on map as marker
+    this.renderWorkoutMarker(workout); // Passing in 'workout' Object, for displaying the Data
+
+    // Hide form + clear input fields
+
     //// CLEAR INPUT FIELDS
     inputDistance.value =
       inputDuration.value =
       inputCadence.value =
       inputElevation.value =
         '';
+  }
 
-    //// DISPLAY MARKER
-    console.log(this.#mapEvent);
-    // Taking the Latitude & Longitude from this 'map' Object
-    const { lat, lng } = this.#mapEvent.latlng;
+  renderWorkoutMarker(workout) {
     // Putting the Marker exactly where user Clicks
     // L.marker creates t he Marker
     // .addTo add the Marker to the 'map'
     // .bindPopup wll create a popup and Bind it to the Marker
-    L.marker([lat, lng])
+    L.marker(workout.coords) // coords coming from the 'workout'
       .addTo(this.#map)
       //.bindPopup('Workout') Instead of specifying a String
       // I will create a brand New Popup Object L.popup({...}), which will contain a couple of Options.
@@ -196,11 +256,11 @@ class App {
           minWidth: 100,
           autoClose: false, // overriding the behavior of the Popup closing, when another Popup is opened.
           closeOnClick: false, // will prevent Popups from closing whenever the User Clicks on the Map.
-          className: 'running-popup', // for customizing Popup (using this one to Assign Any CSS Class Name that I want to the Popup)
+          className: `${workout.type}-popup`, // for customizing Popup (using this one to Assign Any CSS Class Name that I want to the Popup)
         })
       )
       // these 2 Methods always Returned THIS Keyword (the Current Object), therefore they can be CHAINABLE
-      .setPopupContent('Workout')
+      .setPopupContent('workout')
       .openPopup();
   }
 }
