@@ -7,6 +7,8 @@ class Workout {
   // ID (Unique Identifier)
   // Creating ID using Date.now that shows the Current Time Stamp of right now, then convert that to a String and then take the last 10 Numbers.
   id = (Date.now() + '').slice(-10);
+  // On All the 'workouts' adding a Property 'clicks'
+  clicks = 0;
   // Will take in the Data that is common to both 'workouts'
   constructor(coords, distance, duration) {
     // this.date = ...
@@ -27,6 +29,11 @@ class Workout {
       months[this.date.getMonth()]
     } ${this.date.getDate()}`; //Changing the lower (type = 'running'), to Uppercase, then with slice() the rest of the 'type' letters,
   } // and then Month which is 0 based, like an Array, so I wrap it in Array, and day
+
+  // Every Object gets this Method
+  click() {
+    this.clicks++; // Will increase the Number of Clicks
+  }
 }
 
 // I won't directly create a 'workout'
@@ -93,6 +100,7 @@ const inputElevation = document.querySelector('.form__input--elevation');
 class App {
   // I'm gonna Define the 'map' & 'mapEvent' as Properties of the Object, using Private Classes
   #map; // both of them will now become Private Instance Properties
+  #mapZoomLevel = 13;
   #mapEvent; // Properties that are gonna be present on All the Instances created through this Class
   #workouts = [];
 
@@ -112,6 +120,8 @@ class App {
 
     // Listening for the 'change' Event (when selecting 'cycling' and 'running' will 'change' Cadence)
     inputType.addEventListener('change', this._toggleElevationField);
+    // adding the eventHandler to the Parent Element, calling it here, so it will be added right in the beginning
+    containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
   }
 
   //// 1/2 The Current Position should be determined here in this Method
@@ -159,7 +169,7 @@ class App {
     // Whatever String I pass in L.map(), must be the ID Name of an Element in our HTML, and it is in that Element where the Map will be displayed.
     // the 'L' is the Main Function that Leaflet gives us as an Entry Point. (Leaflet basically gives us this 'L' Namespace, and that 'L' has couple of Methods that I can use.)
     // the 'L' Variable is the Global Variable that we can access from All the Other Scripts (it's now available in the 'script' and the Browser Console if i type there 'L')
-    this.#map = L.map('map').setView(coords, 13); // 13 zoom level
+    this.#map = L.map('map').setView(coords, this.#mapZoomLevel); // 13 zoom level
     //console.log(map);
 
     // Added titeLayer
@@ -347,6 +357,34 @@ class App {
     // 'afterend' - because this one will add the New Element as a Sibling Element at the end of the 'form'
     form.insertAdjacentHTML('afterend', html);
   } // we use Data Properties like 'data-id' to usually build a bridge between the UI and Data from the App
+
+  _moveToPopup(e) {
+    // creating the Workout Element, e.target - Clicked Element, then I will look for the 'closest' Workout Parent
+    const workoutEl = e.target.closest('.workout'); // closest() opposite of a querySelector()
+    console.log(workoutEl); // The Element is the one with the Class 'workout', wherever the 'click' happens in the Element, no mather if it's in one of the <div></div> or <span></span>,
+    // all of it will end up in the Li element with the 'workout' Class < class="workout workout"...>, because from the Element that is Clicked, it will move UP to that exact Element there using the closest();
+    if (!workoutEl) return; // ignoring 'null' if clicked outside of a 'workoutEl'
+    // Getting the Workout Data out of the Workouts Array
+    const workout = this.#workouts.find(
+      work => work.id === workoutEl.dataset.id
+    ); // find() will Find an Element of the Array, each Element in the Workouts Array (work), and then I want the one which has 'work.id === to that ID' from the DOM
+    console.log(workout);
+
+    // Taking the 'coords' from the Element, and move the 'map' to that Position
+    // in Leaflet Library setView() does exactly that! This setView() is available on All Map Objects
+    // I will take the '#map' Object that I already have, and then I call the setView()
+    // 1st Argument of setView() is the coordinates, 2nd Argument is the Zoom Level, and then passing in the Object of Options
+    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+      animate: true,
+      pan: {
+        duration: 1, // Animation duration
+      },
+    });
+
+    //// using the Public Interface
+    // Taking the 'workout' Object and using that Public Interface
+    workout.click(); // Will Count the 'clicks' that happen on Each of the workouts, when I click on them on the UI, after I can check how many times I clicked it
+  }
 }
 
 const app = new App(); // inside of the App Class, there is a Method that gets executed as soon as this 'const app' here is created!
