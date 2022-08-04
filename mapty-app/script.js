@@ -1,8 +1,5 @@
 'use strict';
 
-// prettier-ignore
-const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 class Workout {
   // Creating date = and id = like this, is something New in JavaScript that has not been implemented to the language yet
   // Date where the Object is created (the date in which the Workout happened)
@@ -18,6 +15,18 @@ class Workout {
     this.distance = distance; // in km
     this.duration = duration; // in min
   }
+
+  // Whenever a New Object is created, then Automatically this Description will be Set
+  _setDescription() {
+    // for telling the Prettier, to IGNORE the Next Line
+    // prettier-ignore
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // the 'description' will be based on the 'type' of the Activity
+    this.description = `${this.type[0].toUpperCase()}${this.type.slice(1)} on ${
+      months[this.date.getMonth()]
+    } ${this.date.getDate()}`; //Changing the lower (type = 'running'), to Uppercase, then with slice() the rest of the 'type' letters,
+  } // and then Month which is 0 based, like an Array, so I wrap it in Array, and day
 }
 
 // I won't directly create a 'workout'
@@ -31,6 +40,9 @@ class Running extends Workout {
     this.cadence = cadence;
     // it's fine to Call Any Code in a Constructor (did the same in the App Class for Other Methods)
     this.calcPace();
+    // _setDescription will work here perfectly fine, because through the Scope Chain, this Constructor will get access to All the Methods of the Parent Class
+    // and so then as the Method is executed here, it will Also get access to the 'type'
+    this._setDescription(); // setting in the Description from _setDescription()
   }
   // Method for Calculating the Phase is defined in Minutes per Kilometer
   calcPace() {
@@ -49,6 +61,9 @@ class Cycling extends Workout {
     this.elevationGain = elevationGain;
     //this.type = 'cycling'; // same thing upper
     this.calcSpeed();
+    // _setDescription will work here perfectly fine, because through the Scope Chain, this Constructor will get access to All the Methods of the Parent Class
+    // and so then as the Method is executed here, it will Also get access to the 'type'
+    this._setDescription(); // setting in the Description from _setDescription()
   }
   // Method for Calculating the Speed is measured in Kilometers per Hour (opposite of the 'pace')
   calcSpeed() {
@@ -166,6 +181,21 @@ class App {
     inputDistance.focus();
   }
 
+  _hideForm() {
+    // Empty inputs
+    inputDistance.value =
+      inputDuration.value =
+      inputCadence.value =
+      inputElevation.value =
+        '';
+    // Immediately hiding the form first
+    form.getElementsByClassName.display = 'none';
+    // Adding Hidden Class
+    form.classList.add('hidden');
+    // after 1 second, I set this Display Property from CSS back to Grid
+    setTimeout(() => (form.style.display = 'grid'), 1000);
+  }
+
   _toggleElevationField() {
     // selecting the Closest Parent with the 'form__row' Class
     inputElevation.closest('.form__row').classList.toggle('form__row--hidden'); // closest() Method is like an INVERSE querySelector, it selects Parents and Not Children
@@ -229,19 +259,17 @@ class App {
     console.log(workout);
 
     // Render workout on map as marker
-    this.renderWorkoutMarker(workout); // Passing in 'workout' Object, for displaying the Data
+    this._renderWorkoutMarker(workout); // Passing in 'workout' Object, for displaying the Data
+
+    // Render workout on list
+    this._renderWorkout(workout);
 
     // Hide form + clear input fields
-
     //// CLEAR INPUT FIELDS
-    inputDistance.value =
-      inputDuration.value =
-      inputCadence.value =
-      inputElevation.value =
-        '';
+    this._hideForm();
   }
 
-  renderWorkoutMarker(workout) {
+  _renderWorkoutMarker(workout) {
     // Putting the Marker exactly where user Clicks
     // L.marker creates t he Marker
     // .addTo add the Marker to the 'map'
@@ -260,9 +288,65 @@ class App {
         })
       )
       // these 2 Methods always Returned THIS Keyword (the Current Object), therefore they can be CHAINABLE
-      .setPopupContent('workout')
+      .setPopupContent(
+        `${workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'} ${workout.description}`
+      )
       .openPopup();
   }
+  // will take in an Object 'workout'
+  _renderWorkout(workout) {
+    // Creating 'markup' (some HTML) and then I will insert that into the DOM whenever there is a New Workout
+    let html = `
+        <li class="workout workout--${workout.type}" data-id="${workout.id}"> 
+          <h2 class="workout__title">${workout.description}</h2>
+          <div class="workout__details">
+            <span class="workout__icon">${
+              workout.type === 'running' ? '🏃‍♂️' : '🚴‍♀️'
+            }</span>
+            <span class="workout__value">${workout.distance}</span>
+            <span class="workout__unit">km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">⏱</span>
+            <span class="workout__value">${workout.duration}</span>
+            <span class="workout__unit">min</span>
+          </div>
+  `;
+
+    if (workout.type === 'running')
+      // Then I want to add something to HTML
+      html += `
+       <div class="workout__details">
+        <span class="workout__icon">⚡️</span>
+        <span class="workout__value">${workout.pace.toFixed(1)}</span>
+        <span class="workout__unit">min/km</span>
+      </div>
+      <div class="workout__details">
+        <span class="workout__icon">🦶🏼</span>
+        <span class="workout__value">${workout.cadence}</span>
+        <span class="workout__unit">spm</span>
+      </div>
+     </li>
+     `;
+
+    if (workout.type === 'cycling')
+      html += `
+       <div class="workout__details">
+        <span class="workout__icon">⚡️</span>
+        <span class="workout__value">${workout.speed.toFixed(1)}</span>
+        <span class="workout__unit">km/h</span>
+      </div>
+      <div class="workout__details">
+        <span class="workout__icon">⛰</span>
+        <span class="workout__value">${workout.elevationGain}</span>
+        <span class="workout__unit">m</span>
+      </div>
+     </li>
+     `;
+
+    // 'afterend' - because this one will add the New Element as a Sibling Element at the end of the 'form'
+    form.insertAdjacentHTML('afterend', html);
+  } // we use Data Properties like 'data-id' to usually build a bridge between the UI and Data from the App
 }
 
 const app = new App(); // inside of the App Class, there is a Method that gets executed as soon as this 'const app' here is created!
