@@ -109,6 +109,7 @@ const getJSON = function (url, errorMsg = 'Something went wrong') {
 //     });
 // };
 
+// SAME CODE BUT SHORTER, WITH HELPER FUNCTION getJSON
 const getCountryData = function (country) {
   // First AJAX Call
   getJSON(`https://restcountries.com/v2/name/${country}`, 'Country not found') // this fetches the Data
