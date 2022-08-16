@@ -19,10 +19,10 @@ const lotteryPromise = new Promise(function (resolve, reject) {
       // In order to Set the Promise as Fulfilled, I use the resolve()
       // if Win the Lottery means a Fulfilled Promise.
       // into the resolve() I'm passing the Fulfilled Value of the Promise so it can later be Consumed with the then()
-      resolve('You WIN the lottery!');
+      resolve('You WIN the lottery!'); // this Value will be consumed in the then()
     } else {
       // in the reject() I'm passing in the Error Message that I later want to be able in the Catch Handler/Method
-      reject(new Error('You lost your money'));
+      reject(new Error('You lost your money')); // this Error will be in the catch()
     }
   }, 2000);
 }); // this is like the 'fetch' Function, which also creates a Promise
