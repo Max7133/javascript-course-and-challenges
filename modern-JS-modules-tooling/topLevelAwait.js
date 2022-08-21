@@ -46,7 +46,7 @@ const lastPost2 = await getLastPost();
 console.log(lastPost2);
 
 //// One more Important Implication of using Top-Level Await.
-// That is the fact if 1 Module Imports which has a Top-Level Await, then the Importing Module will wait for the Imported Module to finish the blocking code.
+// That is the fact if 1 Module Imports which has a Top-Level Await, then the Importing Module will wait for the Exporting Module to finish the blocking code.
 // Top-Level Await is blocking the Execution, no only in this Module, but also in the Module that is Importing it.
 // Using Top-Level Await, so Await outside of any Async Function will block the Entire Module in a way that we really couldn't block code execution before.
 // This is not only a really helpful tool but also one that we neeed to use with caution
