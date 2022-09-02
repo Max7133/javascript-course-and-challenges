@@ -60,6 +60,11 @@ ehthumbs_vista.db
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
+# Parcel related files
+dist/
+.cache/
+.parcel-cache/
+
 # Windows Installer files
 *.cab
 *.msi
