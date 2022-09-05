@@ -1,19 +1,14 @@
+import { async } from 'regenerator-runtime';
+import { API_URL } from './config.js';
+import { getJSON } from './helpers.js';
 // exporting all these for using later from the 'controller.js'
-
 export const state = {
   recipe: {},
 };
 
 export const loadRecipe = async function (id) {
   try {
-    // Making an AJAX request to an API
-    const res = await fetch(
-      `https://forkify-api.herokuapp.com/api/v2/recipes/${id}`
-    );
-    // Converting result to JSON
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
+    const data = await getJSON(`${API_URL}/${id}`);
 
     //let recipe = data.data.recipe;
     // Since I had 2 recipes on both sides, I used Destructuring on that Object
@@ -32,6 +27,7 @@ export const loadRecipe = async function (id) {
     };
     console.log(state.recipe);
   } catch (err) {
-    alert(err);
+    // Temp error handling
+    console.error(`${err} 🔥🔥🔥`);
   }
 };
