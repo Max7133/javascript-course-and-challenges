@@ -6,6 +6,8 @@ console.log(Fraction);
 class RecipeView {
   #parentElement = document.querySelector('.recipe');
   #data;
+  #errorMessage = 'We could not find that recipe. Please try another one!';
+  #message = '';
 
   render(data) {
     this.#data = data; // render() takes that Data from recipeView.render(model.state.recipe); (controller.js), and stores it inside 'this.data'
@@ -20,7 +22,7 @@ class RecipeView {
   }
 
   // Public Method, so that the Controller can then call this Method here as it starts fetching the Data
-  renderSpinner = function () {
+  renderSpinner() {
     const markup = `
       <div class="spinner">
         <svg>
@@ -29,9 +31,42 @@ class RecipeView {
       </div>
     `;
     // Before inserting, I'm clearing the Parent Element
-    this.#parentElement.innerHTML = '';
+    //this.#parentElement.innerHTML = '';
+    this.#clear();
     this.#parentElement.insertAdjacentHTML('afterbegin', markup);
-  };
+  }
+
+  // Renders Error on the UI
+  renderError(message = this.#errorMessage) {
+    const markup = `
+      <div class="error">
+        <div>
+          <svg>
+            <use href="${icons}#icon-alert-triangle"></use>
+          </svg>
+        </div>
+        <p>${message}</p>
+      </div>
+      `;
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+  }
+
+  // Renders Success Message on the UI
+  renderMessage(message = this.#message) {
+    const markup = `
+        <div class="message">
+          <div>
+            <svg>
+              <use href="${icons}#icon-smile"></use>
+            </svg>
+          </div>
+          <p>${message}</p>
+        </div>
+        `;
+    this.#clear();
+    this.#parentElement.insertAdjacentHTML('afterbegin', markup);
+  }
 
   // Publisher Method (addHandlerRender) needs to get access to the Subscriber Handler Function (handler) (it's called constrolRecipes in controller.js)
   // Renders the recipe right at the beginning
