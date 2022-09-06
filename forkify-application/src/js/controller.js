@@ -26,14 +26,14 @@ const controlRecipes = async function () {
     recipeView.render(model.state.recipe); // model.state.recipe is that 'data' I have received from Step 1 Loading recipe, and then that data is passed into the render(),
     // and then render() takes that data and stores it inside of this.#data in 'recipeView.js'
   } catch (err) {
-    alert(err);
+    console.log(err);
   }
 };
 
-// INSTEAD
-['hashchange', 'load'].forEach(ev =>
-  window.addEventListener(ev, controlRecipes)
-);
+// as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js
+// (that's possible because controller.js Imports BOTH the recipeView.js & model.js)
+const init = function () {
+  recipeView.addHandlerRender(controlRecipes); // controlRecipes executes as soon as the Event happens, which is defined as 'handler' Argument in recipeView.js in addEventListener()
+};
 
-// window.addEventListener('hashchange', controlRecipes);
-// window.addEventListener('load', controlRecipes); // fired off Immediately after the Page has completed loading
+init();

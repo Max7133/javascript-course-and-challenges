@@ -33,6 +33,17 @@ class RecipeView {
     this.#parentElement.insertAdjacentHTML('afterbegin', markup);
   };
 
+  // Publisher Method (addHandlerRender) needs to get access to the Subscriber Handler Function (handler) (it's called constrolRecipes in controller.js)
+  // Renders the recipe right at the beginning
+  // This Function listens for Events
+  addHandlerRender(handler) {
+    // INSTEAD
+    ['hashchange', 'load'].forEach(ev => window.addEventListener(ev, handler));
+
+    // window.addEventListener('hashchange', handler);
+    // window.addEventListener('load', handler); // fired off Immediately after the Page has completed loading
+  }
+
   // Returns an HTML String
   #generateMarkup() {
     return `
