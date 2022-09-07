@@ -1,13 +1,10 @@
 import * as model from './model.js'; // imports everything from 'model.js'
 import recipeView from './views/recipeView.js';
+import searchView from './views/searchView.js';
+
 import 'core-js/stable'; // Polyfills everything else
 import 'regenerator-runtime/runtime'; // Polyfilling Async/Await
-
-const recipeContainer = document.querySelector('.recipe');
-
-// https://forkify-api.herokuapp.com/v2
-
-///////////////////////////////////////
+import { async } from 'regenerator-runtime';
 
 const controlRecipes = async function () {
   try {
@@ -30,10 +27,28 @@ const controlRecipes = async function () {
   }
 };
 
+// This will call the Async Function loadSearchResults from 'model.js'
+const controlSearchResults = async function () {
+  try {
+    // 1) Get search query
+    const query = searchView.getQuery();
+    if (!query) return;
+
+    // 2) Load search results
+    await model.loadSearchResults(query); // not storing into a Variable, because it doesn't Return anything, only manipulates the State
+
+    // 3) Render results
+    console.log(model.state.search.results);
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js
 // (that's possible because controller.js Imports BOTH the recipeView.js & model.js)
 const init = function () {
   recipeView.addHandlerRender(controlRecipes); // controlRecipes executes as soon as the Event happens, which is defined as 'handler' Argument in recipeView.js in addEventListener()
+  searchView.addHandlerSearch(controlSearchResults); // same logic
 };
 
 init();

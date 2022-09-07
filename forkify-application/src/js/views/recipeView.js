@@ -1,7 +1,6 @@
 // import icons from '../../img/icons.svg'; // Parcel 1
 import icons from 'url:../../img/icons.svg'; // Parcel 2
 import { Fraction } from 'fractional'; // library for Numbers like 1/2 instead of 0.5
-console.log(Fraction);
 
 class RecipeView {
   #parentElement = document.querySelector('.recipe');
@@ -52,7 +51,7 @@ class RecipeView {
     this.#parentElement.insertAdjacentHTML('afterbegin', markup);
   }
 
-  // Renders Success Message on the UI
+  // Renders Success on the UI
   renderMessage(message = this.#message) {
     const markup = `
         <div class="message">
