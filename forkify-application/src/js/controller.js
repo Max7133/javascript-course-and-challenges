@@ -1,10 +1,16 @@
 import * as model from './model.js'; // imports everything from 'model.js'
 import recipeView from './views/recipeView.js';
 import searchView from './views/searchView.js';
+import resultsView from './views/resultsView.js';
 
 import 'core-js/stable'; // Polyfills everything else
 import 'regenerator-runtime/runtime'; // Polyfilling Async/Await
 import { async } from 'regenerator-runtime';
+
+// the state of the Page will remain the same (won't reload and clear results)
+if (module.hot) {
+  module.hot.accept();
+}
 
 const controlRecipes = async function () {
   try {
@@ -12,7 +18,7 @@ const controlRecipes = async function () {
     console.log(id); // 5ed6604591c37cdc054bc886
 
     if (!id) return;
-    recipeView.renderSpinner(); // this will automatically render the spinner on the recipeView
+    recipeView.renderSpinner(); // this will automatically render the spinner on the View
 
     // 1) Loading recipe
     // not storing it into a Variable, because this Function doesn't Return anything
@@ -30,15 +36,16 @@ const controlRecipes = async function () {
 // This will call the Async Function loadSearchResults from 'model.js'
 const controlSearchResults = async function () {
   try {
+    resultsView.renderSpinner();
+
     // 1) Get search query
     const query = searchView.getQuery();
     if (!query) return;
-
     // 2) Load search results
     await model.loadSearchResults(query); // not storing into a Variable, because it doesn't Return anything, only manipulates the State
 
     // 3) Render results
-    console.log(model.state.search.results);
+    resultsView.render(model.state.search.results); // 59 pizzas
   } catch (err) {
     console.log(err);
   }
