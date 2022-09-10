@@ -2,6 +2,7 @@ import * as model from './model.js'; // imports everything from 'model.js'
 import recipeView from './views/recipeView.js';
 import searchView from './views/searchView.js';
 import resultsView from './views/resultsView.js';
+import paginationView from './views/paginationView.js';
 
 import 'core-js/stable'; // Polyfills everything else
 import 'regenerator-runtime/runtime'; // Polyfilling Async/Await
@@ -46,10 +47,18 @@ const controlSearchResults = async function () {
 
     // 3) Render results
     //resultsView.render(model.state.search.results); // 59 pizzas
-    resultsView.render(model.getSearchResultsPage()); // start with Page 1
+    resultsView.render(model.getSearchResultsPage(6)); // start with Page 1
+
+    // 4) Render initial pagination buttons
+    paginationView.render(model.state.search); // passing in the entire search Object
   } catch (err) {
     console.log(err);
   }
+};
+
+// Will be executed whenever a Click on one of the Buttons happens
+const controlPagination = function () {
+  console.log('Pagination controller');
 };
 
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js
@@ -57,6 +66,7 @@ const controlSearchResults = async function () {
 const init = function () {
   recipeView.addHandlerRender(controlRecipes); // controlRecipes executes as soon as the Event happens, which is defined as 'handler' Argument in recipeView.js in addEventListener()
   searchView.addHandlerSearch(controlSearchResults); // same logic
+  paginationView.addHandlerClick(controlPagination);
 };
 
 init();
