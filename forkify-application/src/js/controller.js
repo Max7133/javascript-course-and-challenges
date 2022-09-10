@@ -45,7 +45,8 @@ const controlSearchResults = async function () {
     await model.loadSearchResults(query); // not storing into a Variable, because it doesn't Return anything, only manipulates the State
 
     // 3) Render results
-    resultsView.render(model.state.search.results); // 59 pizzas
+    //resultsView.render(model.state.search.results); // 59 pizzas
+    resultsView.render(model.getSearchResultsPage()); // start with Page 1
   } catch (err) {
     console.log(err);
   }
