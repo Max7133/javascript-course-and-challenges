@@ -47,9 +47,9 @@ const controlSearchResults = async function () {
 
     // 3) Render results
     //resultsView.render(model.state.search.results); // 59 pizzas
-    resultsView.render(model.getSearchResultsPage(6)); // start with Page 1
+    resultsView.render(model.getSearchResultsPage()); // start with Page 1
 
-    // 4) Render initial pagination buttons
+    // 4) Render initial pagination buttons (render() will Overwrite the 'markup' that was there previously, because of the clear())
     paginationView.render(model.state.search); // passing in the entire search Object
   } catch (err) {
     console.log(err);
@@ -57,8 +57,13 @@ const controlSearchResults = async function () {
 };
 
 // Will be executed whenever a Click on one of the Buttons happens
-const controlPagination = function () {
-  console.log('Pagination controller');
+const controlPagination = function (goToPage) {
+  // 1) Render NEW results
+  //resultsView.render(model.state.search.results); // 59 pizzas
+  resultsView.render(model.getSearchResultsPage(goToPage)); // when getting results with getSearchResultsPage(goToPage) for e.g. Page 4, then in the model.js state.search.page gets updated
+
+  // 2) Render NEW pagination buttons
+  paginationView.render(model.state.search); // then it will render the new Pagination, and render new Buttons
 };
 
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js
