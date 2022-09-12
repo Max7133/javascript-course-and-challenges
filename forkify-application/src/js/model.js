@@ -74,3 +74,15 @@ export const getSearchResultsPage = function (page = state.search.page) {
   // returns the part of the results (e.g from Result 1 to Result 10)
   return state.search.results.slice(start, end); // slice() doesn't include the Last Value that I pass in
 };
+
+// this Function will reach into the State (Recipe Ingredients) and the change the Quantity Property in Ingredients Array of Objects
+export const updateServings = function (newServings) {
+  state.recipe.ingredients.forEach(ing => {
+    ing.quantity = ing.quantity =
+      (ing.quantity * newServings) / state.recipe.servings;
+    // for e.g. Quantity 2 and changing from 4 Servings to 8 Servings
+    // newQt = oldQt * newServings / oldServings // 2 * 8 / 4 = 4 (Double Servings means Double Quantity)
+  });
+  // Updating Servings in the State (Because otherwise, if updating the Servings twice, then by the 2nd time, I would still be using the Old Value of 2 Servings)
+  state.recipe.servings = newServings; // I put this here at the End of the Function, because otherwise, I could not preserve this Old Original Value of state.recipe.servings
+};
