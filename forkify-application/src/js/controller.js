@@ -70,8 +70,11 @@ const controlPagination = function (goToPage) {
 const controlServings = function (newServings) {
   // Update the recipe servings (in state)
   model.updateServings(newServings);
-  // Update the recipe view (by overwriting the Complete Recipe)
-  recipeView.render(model.state.recipe);
+  // Update the recipe view (by overwriting the Complete Recipe) TEMP!
+  //recipeView.render(model.state.recipe);
+
+  // Update Method() will only update Text and attributes in the DOM, without having to re-render the Entire View like with the render() previosly
+  recipeView.update(model.state.recipe);
 };
 
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js

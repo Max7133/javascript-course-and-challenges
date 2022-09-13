@@ -14,6 +14,23 @@ export default class View {
     this._parentElement.insertAdjacentHTML('afterbegin', markup); // renders HTML on the Page
   } // this is so that I can use this Data all over the place inside of this Object
 
+  update(data) {
+    if (!data || (Array.isArray(data) && data.length === 0))
+      return this.renderError();
+
+    this._data = data;
+    const newMarkup = this._generateMarkup();
+
+    // Converting this Markup String to a DOM Object that's living in the Memory which I can then use to Compare with the actual DOM that's on the page.
+    const newDOM = document.createRange().createContextualFragment(newMarkup); // I passed in the String of newMarkup, like a string of HTML
+    // createContextualFragment() will then convert that String into real DOM Node Objects,'newDOM' here will become like a Big Object,
+    // which is like a Virtual DOM. So a DOM that is not really living on the Page, but which live in our Memory.
+
+    // And so now I can use that DOM as if it was the real DOM on the Page.
+    const newElements = newDOM.querySelectorAll('*'); // selected all Elements in there
+    console.log(newElements); // will show all the Elements that will be contained inside of this newDOM Element, that was created from generating the 'newMarkup' for the Updated Data
+  }
+
   // this Method will be usable for all the Views that hace a 'parentElement' Property
   _clear() {
     this._parentElement.innerHTML = '';
