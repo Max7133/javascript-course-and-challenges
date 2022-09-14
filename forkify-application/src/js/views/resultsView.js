@@ -13,9 +13,15 @@ class ResultsView extends View {
   }
 
   _generateMarkupPreview(result) {
+    // Marking the Current Recipe as Selected on the UI, the Class for that is 'preview__link--active'
+    const id = window.location.hash.slice(1); // takes everything except the 1st element
+    // the # will Change, then the Recipe will get loaded, and the entire search results view will be Updated,
+    // and the ID of the result is the same one in the Browser Link, therefore it will get that Active Class 'preview__link--active'
     return `
     <li class="preview">
-      <a class="preview__link" href="#${result.id}">
+      <a class="preview__link ${
+        result.id === id ? 'preview__link--active' : ''
+      }" href="#${result.id}">
         <figure class="preview__fig">
           <img src="${result.image}" alt="${result.title}" />
         </figure>

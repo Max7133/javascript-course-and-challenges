@@ -21,6 +21,9 @@ const controlRecipes = async function () {
     if (!id) return;
     recipeView.renderSpinner(); // this will automatically render the spinner on the View
 
+    // 0) Update results view to mark selected search result
+    resultsView.update(model.getSearchResultsPage()); // passing in the Current Page
+
     // 1) Loading recipe
     // not storing it into a Variable, because this Function doesn't Return anything
     await model.loadRecipe(id); // loadRecipe is an Async Function, it Returns a Promise, therefore I'm Awaiting

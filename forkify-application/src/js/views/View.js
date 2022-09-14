@@ -15,9 +15,6 @@ export default class View {
   } // this is so that I can use this Data all over the place inside of this Object
 
   update(data) {
-    if (!data || (Array.isArray(data) && data.length === 0))
-      return this.renderError();
-
     this._data = data;
     const newMarkup = this._generateMarkup();
 
@@ -27,8 +24,35 @@ export default class View {
     // which is like a Virtual DOM. So a DOM that is not really living on the Page, but which live in our Memory.
 
     // And so now I can use that DOM as if it was the real DOM on the Page.
-    const newElements = newDOM.querySelectorAll('*'); // selected all Elements in there
-    console.log(newElements); // will show all the Elements that will be contained inside of this newDOM Element, that was created from generating the 'newMarkup' for the Updated Data
+    const newElements = Array.from(newDOM.querySelectorAll('*')); // selected all Elements in there
+    //console.log(newElements); // will show all the Elements that will be contained inside of this newDOM Element, that was created from generating the 'newMarkup' for the Updated Data
+
+    // Getting all the actual Elements that are currently on the Page by selecting them
+    // (so then I can compare them, and only change what happened from the newDOM to the actual current DOM which is on the Page)
+    const curElements = Array.from(this._parentElement.querySelectorAll('*')); // newElements & curElements returns a Node list, so I will convert them to an Array
+
+    // Comparing newElements to curElements
+    newElements.forEach((newEl, i) => {
+      const curEl = curElements[i];
+      console.log(curEl, newEl.isEqualNode(curEl));
+
+      //// Updates changed TEXT
+      if (
+        !newEl.isEqualNode(curEl) &&
+        newEl.firstChild?.nodeValue.trim() !== '' // firstChild will return a Node, and this Child Node contains the 'text' that is nodeValue and it should Not be Empty + trim any white space
+        // in all other Elements that don't contain text directly, the nodeValue will be Null, therefore, this whole Expression will be False, and this replacement here does not take place
+      ) {
+        // then change the text content of the curEl to newEl (this will update the DOM only in places where it has changed)
+        curEl.textContent = newEl.textContent;
+      }
+      //// Updates changed ATTRIBUTES
+      // now changing the Attributes when the newEl is different from the curEl
+      if (!newEl.isEqualNode(curEl))
+        // Converting the 'data-update-to' Object to an Array, and then loop over that Array and copy All the Attributes from newEl to curEl
+        Array.from(newEl.attributes).forEach(
+          attr => curEl.setAttribute(attr.name, attr.value) // replacing All the Attributes in the curEl by the Attributes coming from the newEl
+        );
+    });
   }
 
   // this Method will be usable for all the Views that hace a 'parentElement' Property
