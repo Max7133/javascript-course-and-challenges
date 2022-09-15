@@ -11,6 +11,7 @@ export const state = {
     page: 1,
     resultsPerPage: RES_PER_PAGE,
   },
+  bookmarks: [],
 };
 
 export const loadRecipe = async function (id) {
@@ -32,6 +33,13 @@ export const loadRecipe = async function (id) {
       cookingTime: recipe.cooking_time,
       ingredients: recipe.ingredients,
     };
+
+    // If there is any bookmark, which has the bookmark ID === to the ID that we just received
+    if (state.bookmarks.some(bookmark => bookmark.id === id))
+      // then I want the Current Recipe which is state.recipe to be bookmarked
+      state.recipe.bookmarked = true;
+    else state.recipe.bookmarked = false;
+
     console.log(state.recipe);
   } catch (err) {
     // Temp error handling
@@ -56,6 +64,8 @@ export const loadSearchResults = async function (query) {
         image: rec.image_url,
       };
     });
+    // when loads new search results, then the Page will reset to 1
+    state.search.page = 1;
   } catch (err) {
     console.error(`${err} 🔥🔥🔥`);
     throw err; // throwing the Error again, so I can use it in the Controller
@@ -85,4 +95,26 @@ export const updateServings = function (newServings) {
   });
   // Updating Servings in the State (Because otherwise, if updating the Servings twice, then by the 2nd time, I would still be using the Old Value of 2 Servings)
   state.recipe.servings = newServings; // I put this here at the End of the Function, because otherwise, I could not preserve this Old Original Value of state.recipe.servings
+};
+
+// This Function will receive a Recipe and then it will Set that Recipe as a Bookmark.
+export const addBookmark = function (recipe) {
+  // Add bookmark
+  state.bookmarks.push(recipe);
+
+  // Mark Current Recipe as Bookmarked (state.recipe.id = ID of the Current Recipe)
+  if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+};
+
+export const deleteBookmark = function (id) {
+  // Delete bookmark
+  // index - where the Element is located that I want to Delete
+  const index = state.bookmarks.findIndex(el => el.id === id); // looking for the Element which has the ID === to the ID that was passed in.
+  // There is going to be 1 Bookmark for which el.id === id is true, where the Current Bookmark.id is === to this ID
+  // And so for this Element where this condition is true, the Index will be returned, and then I will take that Index and delete it from the Array
+  // 1 - item that I want to delete
+  state.bookmarks.splice(index, 1);
+
+  // Mark Current Recipe as NOT Bookmarked (state.recipe.id = ID of the Current Recipe)
+  if (id === state.recipe.id) state.recipe.bookmarked = false;
 };

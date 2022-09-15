@@ -34,7 +34,7 @@ export default class View {
     // Comparing newElements to curElements
     newElements.forEach((newEl, i) => {
       const curEl = curElements[i];
-      console.log(curEl, newEl.isEqualNode(curEl));
+      // console.log(curEl, newEl.isEqualNode(curEl));
 
       //// Updates changed TEXT
       if (

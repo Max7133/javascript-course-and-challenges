@@ -80,11 +80,20 @@ const controlServings = function (newServings) {
   recipeView.update(model.state.recipe);
 };
 
+// Controller for adding a New Bookmark
+const controlAddBookmark = function () {
+  if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe);
+  else model.deleteBookmark(model.state.recipe.id);
+  console.log(model.state.recipe);
+  recipeView.update(model.state.recipe);
+};
+
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js
 // (that's possible because controller.js Imports BOTH the recipeView.js & model.js)
 const init = function () {
   recipeView.addHandlerRender(controlRecipes); // controlRecipes executes as soon as the Event happens, which is defined as 'handler' Argument in recipeView.js in addEventListener()
   recipeView.addHandlerUpdateServings(controlServings);
+  recipeView.addHandlerAddBookmark(controlAddBookmark);
   searchView.addHandlerSearch(controlSearchResults); // same logic
   paginationView.addHandlerClick(controlPagination);
 };

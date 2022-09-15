@@ -32,6 +32,17 @@ class RecipeView extends View {
     });
   }
 
+  addHandlerAddBookmark(handler) {
+    // By the time that the Page starts, btn--bookmark DOES NOT EXIST
+    // And so it's impossible to add an eventListener to an Element that doesn't exist, that's why I use here Event Delegation
+    // By simply listen for the Even on a Parent Element, and then try to figure out if the Click actually happened on the Element that I need.
+    this._parentElement.addEventListener('click', function (e) {
+      const btn = e.target.closest('.btn--bookmark');
+      if (!btn) return;
+      handler();
+    });
+  }
+
   // Returns an HTML String
   _generateMarkup() {
     return `
@@ -83,9 +94,11 @@ class RecipeView extends View {
 
           <div class="recipe__user-generated">
           </div>
-          <button class="btn--round">
+          <button class="btn--round btn--bookmark">
             <svg class="">
-              <use href="${icons}#icon-bookmark-fill"></use>
+              <use href="${icons}#icon-bookmark${
+      this._data.bookmarked ? '-fill' : ''
+    }"></use>
             </svg>
           </button>
         </div>
