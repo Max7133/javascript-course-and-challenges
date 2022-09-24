@@ -3,6 +3,7 @@ import recipeView from './views/recipeView.js';
 import searchView from './views/searchView.js';
 import resultsView from './views/resultsView.js';
 import paginationView from './views/paginationView.js';
+import bookmarksView from './views/bookmarksView.js';
 
 import 'core-js/stable'; // Polyfills everything else
 import 'regenerator-runtime/runtime'; // Polyfilling Async/Await
@@ -23,6 +24,7 @@ const controlRecipes = async function () {
 
     // 0) Update results view to mark selected search result
     resultsView.update(model.getSearchResultsPage()); // passing in the Current Page
+    bookmarksView.update(model.state.bookmarks); // highlights selected bookmark
 
     // 1) Loading recipe
     // not storing it into a Variable, because this Function doesn't Return anything
@@ -82,10 +84,15 @@ const controlServings = function (newServings) {
 
 // Controller for adding a New Bookmark
 const controlAddBookmark = function () {
+  // 1) Add/remove bookmark
   if (!model.state.recipe.bookmarked) model.addBookmark(model.state.recipe);
   else model.deleteBookmark(model.state.recipe.id);
-  console.log(model.state.recipe);
+
+  // 2) Update recipe view
   recipeView.update(model.state.recipe);
+
+  // 3) Render bookmarks
+  bookmarksView.render(model.state.bookmarks);
 };
 
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js

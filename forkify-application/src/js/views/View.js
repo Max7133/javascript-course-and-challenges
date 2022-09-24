@@ -3,13 +3,16 @@ import icons from 'url:../../img/icons.svg'; // Parcel 2
 
 export default class View {
   _data;
-  render(data) {
+  render(data, render = true) {
     // if NO data or if there IS data but that data IS an Array and it is Empty, then immediately Return!
     if (!data || (Array.isArray(data) && data.length === 0))
       return this.renderError();
 
     this._data = data; // render() for e.g. takes that Data from recipeView.render(model.state.recipe); (controller.js), and stores it inside 'this.data'
     const markup = this._generateMarkup();
+
+    if (!render) return markup;
+
     this._clear(); // calling the _clear()
     this._parentElement.insertAdjacentHTML('afterbegin', markup); // renders HTML on the Page
   } // this is so that I can use this Data all over the place inside of this Object
