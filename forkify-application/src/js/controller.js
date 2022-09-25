@@ -24,13 +24,15 @@ const controlRecipes = async function () {
 
     // 0) Update results view to mark selected search result
     resultsView.update(model.getSearchResultsPage()); // passing in the Current Page
+
+    // 1) Updating bookmarks view
     bookmarksView.update(model.state.bookmarks); // highlights selected bookmark
 
-    // 1) Loading recipe
+    // 2) Loading recipe
     // not storing it into a Variable, because this Function doesn't Return anything
     await model.loadRecipe(id); // loadRecipe is an Async Function, it Returns a Promise, therefore I'm Awaiting
 
-    // 2) Rendering recipe
+    // 3) Rendering recipe
     // this 'render()' Method, will accept this data, and store it into the Object
     recipeView.render(model.state.recipe); // model.state.recipe is that 'data' I have received from Step 1 Loading recipe, and then that data is passed into the render(),
     // and then render() takes that data and stores it inside of this.#data in 'recipeView.js'
@@ -95,9 +97,15 @@ const controlAddBookmark = function () {
   bookmarksView.render(model.state.bookmarks);
 };
 
+// As the Page tries to Update the bookmarksView, the Bookmarks are already there (Otherwise will Be an Error, because it will try to Update the bookmark list that it will not able to at Line 29)
+const controlBookmarks = function () {
+  bookmarksView.render(model.state.bookmarks);
+};
+
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js
 // (that's possible because controller.js Imports BOTH the recipeView.js & model.js)
 const init = function () {
+  bookmarksView.addHandlerRender(controlBookmarks);
   recipeView.addHandlerRender(controlRecipes); // controlRecipes executes as soon as the Event happens, which is defined as 'handler' Argument in recipeView.js in addEventListener()
   recipeView.addHandlerUpdateServings(controlServings);
   recipeView.addHandlerAddBookmark(controlAddBookmark);

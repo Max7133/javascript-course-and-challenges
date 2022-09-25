@@ -33,6 +33,7 @@ export const loadRecipe = async function (id) {
       cookingTime: recipe.cooking_time,
       ingredients: recipe.ingredients,
     };
+    //console.log(state.recipe); // all 59 recipes
 
     // If there is any bookmark, which has the bookmark ID === to the ID that we just received
     if (state.bookmarks.some(bookmark => bookmark.id === id))
@@ -97,6 +98,11 @@ export const updateServings = function (newServings) {
   state.recipe.servings = newServings; // I put this here at the End of the Function, because otherwise, I could not preserve this Old Original Value of state.recipe.servings
 };
 
+// will store bookmarks to local storage in the browser, but not in UI
+const persistBookmarks = function () {
+  localStorage.setItem('bookmarks', JSON.stringify(state.bookmarks)); // converting state.bookmarks to a String
+};
+
 // This Function will receive a Recipe and then it will Set that Recipe as a Bookmark.
 export const addBookmark = function (recipe) {
   // Add bookmark
@@ -104,6 +110,8 @@ export const addBookmark = function (recipe) {
 
   // Mark Current Recipe as Bookmarked (state.recipe.id = ID of the Current Recipe)
   if (recipe.id === state.recipe.id) state.recipe.bookmarked = true;
+
+  persistBookmarks();
 };
 
 export const deleteBookmark = function (id) {
@@ -118,3 +126,19 @@ export const deleteBookmark = function (id) {
   // Mark Current Recipe as NOT Bookmarked (state.recipe.id = ID of the Current Recipe)
   if (id === state.recipe.id) state.recipe.bookmarked = false;
 };
+
+// getting the Bookmarks from Local Storage, for showing them in the UI
+const init = function () {
+  const storage = localStorage.getItem('bookmarks');
+  // If there is Data in 'storage;, then state.bookmarks String will be converted back to an Object
+  if (storage) state.bookmarks = JSON.parse(storage);
+};
+
+init();
+console.log(state.bookmarks);
+
+// Function that at some point I might want to call, later only during developement
+const clearBookmarks = function () {
+  localStorage.clear();
+};
+//clearBookmarks();

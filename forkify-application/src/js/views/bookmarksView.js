@@ -8,6 +8,11 @@ class BookmarksView extends View {
   _errorMessage = 'No bookmarks yet. Find a nice recipe and bookmark it ;)';
   _message = '';
 
+  // Will immediately render the Bookmarks right at the beginning when the Page is Loaded
+  addHandlerRender(handler) {
+    window.addEventListener('load', handler);
+  }
+
   _generateMarkup() {
     console.log(this._data); // gets access to Data
     // maping over that Data, and so for each of the Bookmarks,
