@@ -1,6 +1,6 @@
 import { async } from 'regenerator-runtime';
-import { API_URL, RES_PER_PAGE } from './config.js';
-import { getJSON } from './helpers.js';
+import { API_URL, RES_PER_PAGE } from './config.js'; // named import
+import { getJSON } from './helpers.js'; // named import
 // exporting all these for using later from the 'controller.js'
 // contains all the Data about the App
 export const state = {

@@ -4,6 +4,7 @@ import searchView from './views/searchView.js';
 import resultsView from './views/resultsView.js';
 import paginationView from './views/paginationView.js';
 import bookmarksView from './views/bookmarksView.js';
+import addRecipeView from './views/addRecipeView.js';
 
 import 'core-js/stable'; // Polyfills everything else
 import 'regenerator-runtime/runtime'; // Polyfilling Async/Await
@@ -102,6 +103,13 @@ const controlBookmarks = function () {
   bookmarksView.render(model.state.bookmarks);
 };
 
+// will receive New Recipe data for the Upload Form
+const controlAddRecipe = function (newRecipe) {
+  console.log(newRecipe);
+
+  // Upload the new recipe data
+};
+
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js
 // (that's possible because controller.js Imports BOTH the recipeView.js & model.js)
 const init = function () {
@@ -111,6 +119,7 @@ const init = function () {
   recipeView.addHandlerAddBookmark(controlAddBookmark);
   searchView.addHandlerSearch(controlSearchResults); // same logic
   paginationView.addHandlerClick(controlPagination);
+  addRecipeView.addHandlerUpload(controlAddRecipe);
 };
 
 init();
