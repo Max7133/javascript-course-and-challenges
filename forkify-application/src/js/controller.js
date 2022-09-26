@@ -104,10 +104,14 @@ const controlBookmarks = function () {
 };
 
 // will receive New Recipe data for the Upload Form
-const controlAddRecipe = function (newRecipe) {
-  console.log(newRecipe);
-
-  // Upload the new recipe data
+const controlAddRecipe = async function (newRecipe) {
+  try {
+    // Upload the new recipe data
+    await model.uploadRecipe(newRecipe);
+  } catch (err) {
+    console.error(err);
+    addRecipeView.renderError(err.message);
+  }
 };
 
 // as soon as the Program loads the 'init' Function is called which immediatelly calls the addHandlerRender Publisher Method from recipeView.js

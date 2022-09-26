@@ -10,10 +10,12 @@ const timeout = function (s) {
   });
 };
 
+// GET request
 export const getJSON = async function (url) {
   try {
     // Making an AJAX request to an API
-    const res = await Promise.race([fetch(url), timeout(TIMEOUT_SEC)]); // 2 Promises url & timeout - whoever wins 1st (faster)
+    const fetchPro = fetch(url);
+    const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]); // 2 Promises url & timeout - whoever wins 1st (faster)
     // Converting result to JSON
     const data = await res.json();
 
@@ -24,6 +26,34 @@ export const getJSON = async function (url) {
     // Taking the Error Object that I already have and throw this New Error.
     // Now with this, the Promise that's being returned from getJSON will Reject (from model.js)
     // then I will be able to handle the Error there in model.js
+    throw err;
+  }
+};
+
+// POST request
+export const sendJSON = async function (url, uploadData) {
+  try {
+    // Passing in an Object of some Options
+    // Headers are some snippets of text, which are like info about the Request itself
+    // with 'Content-Type': 'application/json', I tell the API that the Data I will send is going to be in the JSON format.
+    // only then this API can correctly accept that Data and create a new recipe in the Database
+    // The Payload of the Request, the data that I want to send, which is called the body and it should be in JSON
+    const fetchPro = fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(uploadData),
+    });
+
+    const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]); // 2 Promises url & timeout - whoever wins 1st (faster)
+    // Converting result to JSON
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
+    return data; // this 'data' is going to be the Resolved Value of the Promise that the getJSON Function returns.
+  } catch (err) {
+    // Re-throwing the Error
     throw err;
   }
 };

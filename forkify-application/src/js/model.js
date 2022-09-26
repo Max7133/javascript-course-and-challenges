@@ -1,6 +1,6 @@
 import { async } from 'regenerator-runtime';
-import { API_URL, RES_PER_PAGE } from './config.js'; // named import
-import { getJSON } from './helpers.js'; // named import
+import { API_URL, RES_PER_PAGE, KEY } from './config.js'; // named import
+import { getJSON, sendJSON } from './helpers.js'; // named import
 // exporting all these for using later from the 'controller.js'
 // contains all the Data about the App
 export const state = {
@@ -142,3 +142,49 @@ const clearBookmarks = function () {
   localStorage.clear();
 };
 //clearBookmarks();
+
+// Will eventually make a request to the API, and it will receive the Data for a new recipe
+export const uploadRecipe = async function (newRecipe) {
+  // First it takes the Raw input Data and transforms it into the same format as the Data that I also get out of the API.
+  // Creating a New Array of ingredients (based on existing data), and converting the Object that I get in (newRecipe) back to an Array
+  // And filtering so I can get only Properties that are Ingredients 1,2,3 etc...
+  try {
+    const ingredients = Object.entries(newRecipe)
+      // the filter() the 1st Element of the Current Entry should start with Ingredient ans the 2nd one should exist, so it should not be an Empty String
+      .filter(entry => entry[0].startsWith('ingredient') && entry[1] !== '')
+      .map(ing => {
+        // Taking the Data out of the String and putting it into an Object
+        // So for that, I'm taking each Ingredient and Spliting it by ',' <-- Comma, and removing white space with an Empty String by using replaceAll()
+        const ingArr = ing[1] // ing[1] because this is the 2nd Entry - the Value (the 1st Entry was the Key)
+          .replaceAll(' ', '')
+          .split(','); // this should then Return an Array of 3 Elements
+        if (ingArr.length !== 3)
+          throw new Error(
+            'Wrong ingredient format! Please use the correct format :)'
+          );
+
+        const [quantity, unit, description] = ingArr;
+        // Returns an Object with this
+        return { quantity: quantity ? +quantity : null, unit, description };
+      });
+
+    // Creating an Object that is ready to be Uploaded
+    // This Object will be the opposite of the state.recipe = {..object..}
+    // that's is the Format that the API is ready to receive, it has to be exactly the way I received it
+    const recipe = {
+      title: newRecipe.title,
+      source_url: newRecipe.sourceUrl,
+      image_url: newRecipe.image,
+      publisher: newRecipe.publisher,
+      cooking_time: +newRecipe.cookingTime,
+      servings: +newRecipe.servings,
+      ingredients,
+    };
+
+    // This will also send the Recipe back to the User (sendJSON has 2 Paremeters url & data)
+    const data = await sendJSON(`${API_URL}?key=${KEY}`, recipe); // ? to specift a list of Parameters
+    console.log(data);
+  } catch (err) {
+    throw err;
+  }
+};
