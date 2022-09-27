@@ -1,6 +1,7 @@
 import { async } from 'regenerator-runtime';
 import { API_URL, RES_PER_PAGE, KEY } from './config.js'; // named import
-import { getJSON, sendJSON } from './helpers.js'; // named import
+//import { getJSON, sendJSON } from './helpers.js'; // named import
+import { AJAX } from './helpers.js'; // named import
 // exporting all these for using later from the 'controller.js'
 // contains all the Data about the App
 export const state = {
@@ -16,7 +17,11 @@ export const state = {
 
 // Object that is created when uploading the recipe to the API
 const createRecipeObject = function (data) {
+  //let recipe = data.data.recipe;
+  // Since I had 2 recipes on both sides, I used Destructuring on that Object
   const { recipe } = data.data;
+  // Formating the Data by creating a New Object, based on this Object which has better Variable Names
+  // while removing Underscores & adding camelCase instead
   return {
     id: recipe.id,
     title: recipe.title,
@@ -26,33 +31,20 @@ const createRecipeObject = function (data) {
     servings: recipe.servings,
     cookingTime: recipe.cooking_time,
     ingredients: recipe.ingredients,
-    ...(recipe.key && { key: recipe.key }), // if recipe.key is Falsy Value (doesn't exist) then nothing happens
-  }; // if recipe.key has a Value, then the second part of the Operator is executed and returned, this Object { key: recipe.key }
-}; // then this whole Expression will become that Object, then I can spread it and put the Values here,
+    ...(recipe.key && { key: recipe.key }),
+  };
+};
+// if recipe.key is Falsy Value (doesn't exist) then nothing happens
+// if recipe.key has a Value, then the second part of the Operator is executed and returned, this Object { key: recipe.key }
+// then this whole Expression will become that Object, then I can spread it and put the Values here,
 // and so that will then be the same as if the Values would be out here like this, key: recipe.key
-// This was CONDITIONALLY ADDING PROPERTIES TO AN OBJECT
+// This was CONDITIONALLY ADDING PROPERTIES TO AN OBJECT (UPPER in return {})
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 export const loadRecipe = async function (id) {
   try {
-    const data = await getJSON(`${API_URL}${id}`);
+    const data = await AJAX(`${API_URL}${id}?key=${KEY}`);
     state.recipe = createRecipeObject(data);
-
-    //let recipe = data.data.recipe;
-    // Since I had 2 recipes on both sides, I used Destructuring on that Object
-    const { recipe } = data.data;
-    // Formating the Data by creating a New Object, based on this Object which has better Variable Names
-    // while removing Underscores & adding camelCase instead
-    state.recipe = {
-      id: recipe.id,
-      title: recipe.title,
-      publisher: recipe.publisher,
-      sourceUrl: recipe.source_url,
-      image: recipe.image_url,
-      servings: recipe.servings,
-      cookingTime: recipe.cooking_time,
-      ingredients: recipe.ingredients,
-    };
-    //console.log(state.recipe); // all 59 recipes
 
     // If there is any bookmark, which has the bookmark ID === to the ID that we just received
     if (state.bookmarks.some(bookmark => bookmark.id === id))
@@ -60,7 +52,7 @@ export const loadRecipe = async function (id) {
       state.recipe.bookmarked = true;
     else state.recipe.bookmarked = false;
 
-    console.log(state.recipe);
+    console.log(state.recipe); // all 59 recipes
   } catch (err) {
     // Temp error handling
     console.error(`${err} 🔥🔥🔥`);
@@ -71,7 +63,8 @@ export const loadRecipe = async function (id) {
 export const loadSearchResults = async function (query) {
   try {
     state.search.query = query;
-    const data = await getJSON(`${API_URL}?search=${query}`);
+    // ?key=${KEY} will then load all the recipe including the ones that contain My Own Key
+    const data = await AJAX(`${API_URL}?search=${query}&key=${KEY}`);
     console.log(data);
 
     // the (data) that I get from console.log()
@@ -82,6 +75,7 @@ export const loadSearchResults = async function (query) {
         title: rec.title,
         publisher: rec.publisher,
         image: rec.image_url,
+        ...(rec.key && { key: rec.key }),
       };
     });
     // when loads new search results, then the Page will reset to 1
@@ -144,6 +138,8 @@ export const deleteBookmark = function (id) {
 
   // Mark Current Recipe as NOT Bookmarked (state.recipe.id = ID of the Current Recipe)
   if (id === state.recipe.id) state.recipe.bookmarked = false;
+
+  persistBookmarks();
 };
 
 // getting the Bookmarks from Local Storage, for showing them in the UI
@@ -174,9 +170,14 @@ export const uploadRecipe = async function (newRecipe) {
       .map(ing => {
         // Taking the Data out of the String and putting it into an Object
         // So for that, I'm taking each Ingredient and Spliting it by ',' <-- Comma, and removing white space with an Empty String by using replaceAll()
-        const ingArr = ing[1] // ing[1] because this is the 2nd Entry - the Value (the 1st Entry was the Key)
-          .replaceAll(' ', '')
-          .split(','); // this should then Return an Array of 3 Elements
+
+        // const ingArr = ing[1] // ing[1] because this is the 2nd Entry - the Value (the 1st Entry was the Key)
+        //   .replaceAll(' ', '')
+        //   .split(','); // this should then Return an Array of 3 Elements
+
+        // Splitting the String into multiple parts, which returns an Array, and then I will loop over that Array and trim() each of the Elements
+        const ingArr = ing[1].split(',').map(el => el.trim());
+
         if (ingArr.length !== 3)
           throw new Error(
             'Wrong ingredient format! Please use the correct format :)'
@@ -201,7 +202,7 @@ export const uploadRecipe = async function (newRecipe) {
     };
 
     // This will also send the Recipe back to the User (sendJSON has 2 Paremeters url & data)
-    const data = await sendJSON(`${API_URL}?key=${KEY}`, recipe); // ? to specift a list of Parameters
+    const data = await AJAX(`${API_URL}?key=${KEY}`, recipe); // ? to specift a list of Parameters
     // Storing the Data I get into the State
     state.recipe = createRecipeObject(data);
     addBookmark(state.recipe);

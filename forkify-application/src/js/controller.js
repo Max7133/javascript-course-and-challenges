@@ -1,11 +1,11 @@
 import * as model from './model.js'; // imports everything from 'model.js'
+import { MODAL_CLOSE_SEC } from './config.js';
 import recipeView from './views/recipeView.js';
 import searchView from './views/searchView.js';
 import resultsView from './views/resultsView.js';
 import paginationView from './views/paginationView.js';
 import bookmarksView from './views/bookmarksView.js';
 import addRecipeView from './views/addRecipeView.js';
-import { MODAL_CLOSE_SEC } from './config.js';
 
 import 'core-js/stable'; // Polyfills everything else
 import 'regenerator-runtime/runtime'; // Polyfilling Async/Await
@@ -118,6 +118,14 @@ const controlAddRecipe = async function (newRecipe) {
 
     // Success message
     addRecipeView.renderMessage();
+
+    // Render bookmark view (not update() because I'm Inserting a new Element)
+    bookmarksView.render(model.state.bookmarks);
+
+    // Changing the ID in URL with History API
+    // pushState has 3 Arguments: state, title, url
+    window.history.pushState(null, '', `#${model.state.recipe.id}`); // window.history - is the history API for the Browsers, pushState() will allow to change the URL without reloading the Page
+    // window.history.back(); // Automaticly going back to the Last Page
 
     // Close Upload Form Window for adding a recipe
     setTimeout(function () {

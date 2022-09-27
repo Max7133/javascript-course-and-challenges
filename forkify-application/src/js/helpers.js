@@ -10,6 +10,37 @@ const timeout = function (s) {
   });
 };
 
+// When calling this AJAX Function, only with 'url', then there is no upload data, in that case I will define the fetchPro as only fetch(url)
+export const AJAX = async function (url, uploadData = undefined) {
+  try {
+    // Conditionally defining fetchPro Variable
+    const fetchPro = uploadData
+      ? fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(uploadData),
+        })
+      : fetch(url);
+
+    // Making an AJAX request to an API
+    const res = await Promise.race([fetchPro, timeout(TIMEOUT_SEC)]); // 2 Promises url & timeout - whoever wins 1st (faster)
+    // Converting result to JSON
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(`${data.message} (${res.status})`);
+    return data; // this 'data' is going to be the Resolved Value of the Promise that the getJSON Function returns.
+  } catch (err) {
+    // Re-throwing the Error
+    // Taking the Error Object that I already have and throw this New Error.
+    // Now with this, the Promise that's being returned from getJSON will Reject (from model.js)
+    // then I will be able to handle the Error there in model.js
+    throw err;
+  }
+};
+
+/*
 // GET request
 export const getJSON = async function (url) {
   try {
@@ -57,3 +88,4 @@ export const sendJSON = async function (url, uploadData) {
     throw err;
   }
 };
+*/
